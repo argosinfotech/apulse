@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, ExternalLink, Pencil, Trash2, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge, HealthStatus } from "@/components/ui/status-badge";
 import {
   DropdownMenu,
@@ -21,6 +22,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ClientFormModal, Client, ClientFormData } from "@/components/clients/ClientFormModal";
+import { useAuth } from "@/contexts/AuthContext";
+import { canEdit } from "@/config/permissions";
 import { toast } from "sonner";
 
 const initialClients: Client[] = [
@@ -89,6 +92,9 @@ const initialClients: Client[] = [
 ];
 
 export default function Clients() {
+  const { user } = useAuth();
+  const canEditClients = user ? canEdit(user.role, "clients") : false;
+  
   const [clients, setClients] = useState<Client[]>(initialClients);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterHealth, setFilterHealth] = useState<HealthStatus | "all">("all");
@@ -160,19 +166,29 @@ export default function Clients() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Clients</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage client relationships and health status
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Clients</h1>
+            <p className="text-muted-foreground mt-1">
+              {canEditClients ? "Manage client relationships and health status" : "View client relationships and health status"}
+            </p>
+          </div>
+          {!canEditClients && (
+            <Badge variant="outline" className="bg-muted/50">
+              <Eye className="h-3 w-3 mr-1" />
+              View Only
+            </Badge>
+          )}
         </div>
-        <Button 
-          className="bg-accent hover:bg-accent/90 text-accent-foreground"
-          onClick={handleAddClient}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Client
-        </Button>
+        {canEditClients && (
+          <Button 
+            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            onClick={handleAddClient}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Client
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
@@ -288,26 +304,33 @@ export default function Clients() {
                       )}
                     </td>
                     <td className="py-4 px-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEditClient(client)}>
-                            <Pencil className="h-4 w-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteClick(client)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {canEditClients ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditClient(client)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteClick(client)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
