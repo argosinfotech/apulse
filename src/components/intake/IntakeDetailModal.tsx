@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { IntakeRequest, IntakeStatus, IntakeNote, IntakeNoteAttachment } from "./IntakeFormModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Dialog,
   DialogContent,
@@ -260,12 +260,11 @@ export function IntakeDetailModal({
           {/* Add Note Input - Full Width */}
           {showNoteInput && canEdit && (
             <div className="space-y-2 p-3 rounded border border-border bg-muted/30">
-              <Textarea
+              <RichTextEditor
                 placeholder="Add a note..."
                 value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                className="resize-none bg-background text-xs min-h-[60px]"
-                rows={2}
+                onChange={setNewNote}
+                minHeight="60px"
               />
               
               <input

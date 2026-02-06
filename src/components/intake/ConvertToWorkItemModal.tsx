@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { IntakeRequest } from "./IntakeFormModal";
 import { ArrowRight } from "lucide-react";
 
@@ -121,11 +121,11 @@ export function ConvertToWorkItemModal({
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <RichTextEditor 
                       placeholder="Add any additional details..."
-                      className="resize-none"
-                      rows={3}
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      minHeight="80px"
                     />
                   </FormControl>
                   <FormMessage />
