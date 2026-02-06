@@ -33,6 +33,13 @@ export type IntakeType = "Bug" | "Feature" | "Enhancement" | "SEO" | "Content" |
 export type IntakeSource = "Email" | "Call" | "Meeting" | "WhatsApp" | "Slack";
 export type IntakeUrgency = "Low" | "Medium" | "High" | "Critical";
 
+export interface IntakeNote {
+  id: string;
+  text: string;
+  author: string;
+  createdAt: string;
+}
+
 export interface IntakeRequest {
   id: string;
   client: string;
@@ -44,6 +51,7 @@ export interface IntakeRequest {
   intakeDate: string;
   daysOld: number;
   clarifyingQuestions?: string;
+  notes?: IntakeNote[];
 }
 
 const intakeFormSchema = z.object({
