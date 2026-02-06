@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
@@ -251,12 +251,11 @@ export function EscalationDetailModal({
                       Select an option above, then add notes below.
                     </p>
                     <Label htmlFor="decision-notes" className="text-xs">Decision Notes</Label>
-                    <Textarea
-                      id="decision-notes"
+                    <RichTextEditor
                       placeholder="Add context or instructions..."
                       value={decisionNotes}
-                      onChange={(e) => setDecisionNotes(e.target.value)}
-                      className="mt-1 text-xs min-h-[60px]"
+                      onChange={setDecisionNotes}
+                      minHeight="60px"
                     />
                   </div>
                   <div className="flex gap-2">

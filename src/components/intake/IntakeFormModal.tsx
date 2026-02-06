@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 // Available clients for dropdown
 const availableClients = [
@@ -176,11 +176,11 @@ export function IntakeFormModal({ open, onOpenChange, request, onSubmit }: Intak
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <RichTextEditor 
                       placeholder="Describe the request..."
-                      className="resize-none"
-                      rows={3}
-                      {...field}
+                      value={field.value}
+                      onChange={field.onChange}
+                      minHeight="80px"
                     />
                   </FormControl>
                   <FormMessage />
@@ -273,11 +273,11 @@ export function IntakeFormModal({ open, onOpenChange, request, onSubmit }: Intak
                 <FormItem>
                   <FormLabel>Clarifying Questions (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <RichTextEditor 
                       placeholder="Any questions to ask the client..."
-                      className="resize-none"
-                      rows={2}
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      minHeight="60px"
                     />
                   </FormControl>
                   <FormMessage />

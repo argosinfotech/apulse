@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -232,10 +232,11 @@ export function RiskFormModal({ open, onOpenChange, risk, onSubmit }: RiskFormMo
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
                       placeholder="Describe the risk or blocker..."
-                      className="min-h-[80px]"
-                      {...field}
+                      value={field.value}
+                      onChange={field.onChange}
+                      minHeight="80px"
                     />
                   </FormControl>
                   <FormMessage />
@@ -251,10 +252,11 @@ export function RiskFormModal({ open, onOpenChange, risk, onSubmit }: RiskFormMo
                 <FormItem>
                   <FormLabel>Mitigation Plan</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
                       placeholder="What steps are being taken to address this risk?"
-                      className="min-h-[80px]"
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      minHeight="80px"
                     />
                   </FormControl>
                   <FormMessage />

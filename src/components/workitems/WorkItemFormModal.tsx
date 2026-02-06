@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { X, Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -501,11 +501,11 @@ export function WorkItemFormModal({ open, onOpenChange, workItem, onSubmit, clie
                 <FormItem>
                   <FormLabel>Internal Notes</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
                       placeholder="Internal team notes..."
-                      className="resize-none"
-                      rows={2}
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      minHeight="60px"
                     />
                   </FormControl>
                   <FormMessage />

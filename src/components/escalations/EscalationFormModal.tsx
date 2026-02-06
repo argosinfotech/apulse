@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -239,10 +239,11 @@ export function EscalationFormModal({ open, onOpenChange, escalation, onSubmit }
                 <FormItem>
                   <FormLabel>Context</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
                       placeholder="Provide detailed context about the situation requiring escalation..."
-                      className="min-h-[100px]"
-                      {...field}
+                      value={field.value}
+                      onChange={field.onChange}
+                      minHeight="100px"
                     />
                   </FormControl>
                   <FormMessage />
@@ -286,7 +287,12 @@ export function EscalationFormModal({ open, onOpenChange, escalation, onSubmit }
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Textarea placeholder="Describe this option, including implications..." {...field} />
+                          <RichTextEditor 
+                            placeholder="Describe this option, including implications..." 
+                            value={field.value}
+                            onChange={field.onChange}
+                            minHeight="60px"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -307,10 +313,11 @@ export function EscalationFormModal({ open, onOpenChange, escalation, onSubmit }
                 <FormItem>
                   <FormLabel>DCOL Recommendation</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <RichTextEditor
                       placeholder="Your recommended course of action and rationale..."
-                      className="min-h-[80px]"
-                      {...field}
+                      value={field.value}
+                      onChange={field.onChange}
+                      minHeight="80px"
                     />
                   </FormControl>
                   <FormMessage />
