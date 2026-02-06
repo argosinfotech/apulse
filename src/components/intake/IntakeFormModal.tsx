@@ -33,11 +33,19 @@ export type IntakeType = "Bug" | "Feature" | "Enhancement" | "SEO" | "Content" |
 export type IntakeSource = "Email" | "Call" | "Meeting" | "WhatsApp" | "Slack";
 export type IntakeUrgency = "Low" | "Medium" | "High" | "Critical";
 
+export interface IntakeNoteAttachment {
+  id: string;
+  name: string;
+  size: string;
+  type: string;
+}
+
 export interface IntakeNote {
   id: string;
   text: string;
   author: string;
   createdAt: string;
+  attachment?: IntakeNoteAttachment;
 }
 
 export interface IntakeRequest {

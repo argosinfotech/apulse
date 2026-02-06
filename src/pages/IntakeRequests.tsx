@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { IntakeFormModal, IntakeRequest, IntakeStatus, IntakeFormData } from "@/components/intake/IntakeFormModal";
+import { IntakeFormModal, IntakeRequest, IntakeStatus, IntakeFormData, IntakeNoteAttachment } from "@/components/intake/IntakeFormModal";
 import { IntakeDetailModal } from "@/components/intake/IntakeDetailModal";
 import { ConvertToWorkItemModal, WorkItemFormData } from "@/components/intake/ConvertToWorkItemModal";
 import { useAuth } from "@/contexts/AuthContext";
@@ -160,12 +160,13 @@ export default function IntakeRequests() {
     toast.success(`Work item "${data.title}" created from ${requestId}`);
   };
 
-  const handleAddNote = (requestId: string, noteText: string) => {
+  const handleAddNote = (requestId: string, noteText: string, attachment?: IntakeNoteAttachment) => {
     const newNote = {
       id: `note-${Date.now()}`,
       text: noteText,
       author: user?.name || "Unknown",
       createdAt: new Date().toLocaleString(),
+      attachment,
     };
     setRequests(requests.map((r) =>
       r.id === requestId 
@@ -178,7 +179,7 @@ export default function IntakeRequests() {
         ? { ...prev, notes: [...(prev.notes || []), newNote] }
         : prev
     );
-    toast.success("Note added");
+    toast.success(attachment ? "Note with attachment added" : "Note added");
   };
 
   const handleFormSubmit = (data: IntakeFormData) => {

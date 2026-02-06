@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { IntakeRequest, IntakeStatus, IntakeNote } from "./IntakeFormModal";
+import { useState, useRef } from "react";
+import { IntakeRequest, IntakeStatus, IntakeNote, IntakeNoteAttachment } from "./IntakeFormModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Clock, User, MessageSquare, Tag, ArrowRight, Pencil, Trash2, Send, Plus } from "lucide-react";
+import { Calendar, Clock, User, MessageSquare, Tag, ArrowRight, Pencil, Trash2, Send, Plus, Paperclip, X, FileText, Image, File } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface IntakeDetailModalProps {
@@ -28,7 +28,7 @@ interface IntakeDetailModalProps {
   onDelete: (request: IntakeRequest) => void;
   onStatusChange: (request: IntakeRequest, status: IntakeStatus) => void;
   onConvert: (request: IntakeRequest) => void;
-  onAddNote: (requestId: string, note: string) => void;
+  onAddNote: (requestId: string, note: string, attachment?: IntakeNoteAttachment) => void;
   canEdit: boolean;
 }
 
@@ -46,15 +46,56 @@ export function IntakeDetailModal({
   const { user } = useAuth();
   const [newNote, setNewNote] = useState("");
   const [showNoteInput, setShowNoteInput] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!request) return null;
 
-  const handleAddNote = () => {
-    if (newNote.trim()) {
-      onAddNote(request.id, newNote.trim());
-      setNewNote("");
-      setShowNoteInput(false);
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
     }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleAddNote = () => {
+    if (newNote.trim() || selectedFile) {
+      let attachment: IntakeNoteAttachment | undefined;
+      if (selectedFile) {
+        attachment = {
+          id: `att-${Date.now()}`,
+          name: selectedFile.name,
+          size: formatFileSize(selectedFile.size),
+          type: selectedFile.type,
+        };
+      }
+      onAddNote(request.id, newNote.trim(), attachment);
+      setNewNote("");
+      setSelectedFile(null);
+      setShowNoteInput(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith("image/")) return Image;
+    if (type.includes("pdf") || type.includes("document")) return FileText;
+    return File;
   };
 
   const getUrgencyColor = (urgency: string) => {
@@ -164,16 +205,56 @@ export function IntakeDetailModal({
 
             {/* Add Note Input */}
             {showNoteInput && canEdit && (
-              <div className="mb-3 space-y-2">
+              <div className="mb-3 space-y-2 p-3 rounded-lg border border-border bg-muted/30">
                 <Textarea
                   placeholder="Add a note (e.g., 'Asked client for date range requirements via email')"
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
-                  className="resize-none"
+                  className="resize-none bg-background"
                   rows={2}
                 />
-                <div className="flex items-center gap-2">
-                  <Button size="sm" onClick={handleAddNote} disabled={!newNote.trim()}>
+                
+                {/* File Attachment */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
+                />
+                
+                {selectedFile ? (
+                  <div className="flex items-center gap-2 p-2 rounded bg-background border border-border">
+                    <Paperclip className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground flex-1 truncate">{selectedFile.name}</span>
+                    <span className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6"
+                      onClick={handleRemoveFile}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Paperclip className="h-3 w-3 mr-1" />
+                    Attach File
+                  </Button>
+                )}
+
+                <div className="flex items-center gap-2 pt-1">
+                  <Button 
+                    size="sm" 
+                    onClick={handleAddNote} 
+                    disabled={!newNote.trim() && !selectedFile}
+                  >
                     <Send className="h-3 w-3 mr-1" />
                     Add Note
                   </Button>
@@ -183,6 +264,7 @@ export function IntakeDetailModal({
                     onClick={() => {
                       setShowNoteInput(false);
                       setNewNote("");
+                      setSelectedFile(null);
                     }}
                   >
                     Cancel
@@ -192,21 +274,37 @@ export function IntakeDetailModal({
             )}
 
             {/* Notes List */}
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="space-y-2 max-h-48 overflow-y-auto">
               {request.notes && request.notes.length > 0 ? (
-                request.notes.map((note) => (
-                  <div 
-                    key={note.id} 
-                    className="p-2 rounded bg-muted/50 text-sm"
-                  >
-                    <p className="text-foreground">{note.text}</p>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <span>{note.author}</span>
-                      <span>•</span>
-                      <span>{note.createdAt}</span>
+                request.notes.map((note) => {
+                  const FileIcon = note.attachment ? getFileIcon(note.attachment.type) : File;
+                  return (
+                    <div 
+                      key={note.id} 
+                      className="p-3 rounded-lg bg-muted/50 text-sm"
+                    >
+                      {note.text && (
+                        <p className="text-foreground">{note.text}</p>
+                      )}
+                      {note.attachment && (
+                        <div className="flex items-center gap-2 mt-2 p-2 rounded bg-background border border-border">
+                          <FileIcon className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-foreground flex-1 truncate">
+                            {note.attachment.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {note.attachment.size}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <span>{note.author}</span>
+                        <span>•</span>
+                        <span>{note.createdAt}</span>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-sm text-muted-foreground italic">No notes yet</p>
               )}
