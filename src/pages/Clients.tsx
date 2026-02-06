@@ -165,18 +165,13 @@ export default function Clients() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Clients</h1>
-            <p className="text-muted-foreground mt-1">
-              {canEditClients ? "Manage client relationships and health status" : "View client relationships and health status"}
-            </p>
-          </div>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-foreground">Clients</h1>
           {!canEditClients && (
-            <Badge variant="outline" className="bg-muted/50">
+            <Badge variant="outline" className="bg-muted/50 text-xs">
               <Eye className="h-3 w-3 mr-1" />
               View Only
             </Badge>
@@ -184,84 +179,66 @@ export default function Clients() {
         </div>
         {canEditClients && (
           <Button 
+            size="sm"
             className="bg-accent hover:bg-accent/90 text-accent-foreground"
             onClick={handleAddClient}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-1" />
             Add Client
           </Button>
         )}
       </div>
 
-      {/* Filters */}
-      <Card className="shadow-card">
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search clients..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={filterHealth === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterHealth("all")}
-              >
-                All
-              </Button>
-              <Button
-                variant={filterHealth === "red" ? "destructive" : "outline"}
-                size="sm"
-                onClick={() => setFilterHealth("red")}
-              >
-                Critical
-              </Button>
-              <Button
-                variant={filterHealth === "yellow" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterHealth("yellow")}
-                className={filterHealth === "yellow" ? "bg-warning hover:bg-warning/90" : ""}
-              >
-                At Risk
-              </Button>
-              <Button
-                variant={filterHealth === "green" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterHealth("green")}
-                className={filterHealth === "green" ? "bg-success hover:bg-success/90" : ""}
-              >
-                Healthy
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Compact Filters */}
+      <div className="flex items-center gap-3">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search clients..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 h-8 text-sm"
+          />
+        </div>
+        <div className="flex items-center gap-1">
+          {[
+            { key: "all", label: "All", color: "" },
+            { key: "red", label: "Critical", color: "bg-destructive" },
+            { key: "yellow", label: "At Risk", color: "bg-warning" },
+            { key: "green", label: "Healthy", color: "bg-success" },
+          ].map((filter) => (
+            <button
+              key={filter.key}
+              onClick={() => setFilterHealth(filter.key as HealthStatus | "all")}
+              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                filterHealth === filter.key
+                  ? filter.color
+                    ? `${filter.color} text-white`
+                    : "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* Client List */}
+      {/* Compact Client List */}
       <Card className="shadow-card">
-        <CardHeader className="pb-0">
-          <CardTitle className="text-lg font-semibold">
-            {filteredClients.length} Clients
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Health</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Client</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Type</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Last Touch</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Next Milestone</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Work Items</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Escalations</th>
-                  <th className="py-3 px-4"></th>
+                <tr className="border-b border-border bg-muted/30">
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Health</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Client</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Type</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Last Touch</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Next Milestone</th>
+                  <th className="text-center py-2 px-3 text-xs font-medium text-muted-foreground">WI</th>
+                  <th className="text-center py-2 px-3 text-xs font-medium text-muted-foreground">Esc</th>
+                  <th className="py-2 px-3"></th>
                 </tr>
               </thead>
               <tbody>
@@ -271,53 +248,47 @@ export default function Clients() {
                     className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => navigate(`/clients/${client.id}`)}
                   >
-                    <td className="py-4 px-4">
+                    <td className="py-2 px-3">
                       <StatusBadge status={client.health} />
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-foreground">{client.name}</span>
-                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                      </div>
-                      {client.healthReason && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{client.healthReason}</p>
-                      )}
+                    <td className="py-2 px-3">
+                      <span className="text-xs font-medium text-foreground">{client.name}</span>
                     </td>
-                    <td className="py-4 px-4">
-                      <span className="text-sm text-muted-foreground">{client.accountType}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs text-muted-foreground">{client.accountType}</span>
                     </td>
-                    <td className="py-4 px-4">
-                      <span className="text-sm text-foreground">{client.lastTouch}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs text-foreground">{client.lastTouch}</span>
                     </td>
-                    <td className="py-4 px-4">
-                      <span className="text-sm text-muted-foreground">{client.nextMilestone}</span>
+                    <td className="py-2 px-3 max-w-[150px]">
+                      <span className="text-xs text-muted-foreground line-clamp-1">{client.nextMilestone}</span>
                     </td>
-                    <td className="py-4 px-4 text-center">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                    <td className="py-2 px-3 text-center">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary font-medium text-xs">
                         {client.activeWorkItems}
                       </span>
                     </td>
-                    <td className="py-4 px-4 text-center">
+                    <td className="py-2 px-3 text-center">
                       {client.openEscalations > 0 ? (
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-destructive/10 text-destructive font-semibold text-sm">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-destructive/10 text-destructive font-medium text-xs">
                           {client.openEscalations}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </td>
-                    <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-2 px-3" onClick={(e) => e.stopPropagation()}>
                       {canEditClients ? (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <MoreHorizontal className="h-3.5 w-3.5" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => navigate(`/clients/${client.id}`)}>
                               <Eye className="h-4 w-4 mr-2" />
-                              View Details
+                              View
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleEditClient(client)}>
                               <Pencil className="h-4 w-4 mr-2" />
@@ -335,13 +306,13 @@ export default function Clients() {
                       ) : (
                         <Button 
                           variant="ghost" 
-                          size="sm" 
+                          size="sm"
+                          className="h-6 text-xs"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/clients/${client.id}`);
                           }}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
                           View
                         </Button>
                       )}
@@ -351,6 +322,11 @@ export default function Clients() {
               </tbody>
             </table>
           </div>
+          {filteredClients.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground">No clients found.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
