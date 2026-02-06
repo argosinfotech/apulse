@@ -251,18 +251,13 @@ export default function WorkItems() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Work Items</h1>
-            <p className="text-muted-foreground mt-1">
-              {canEditWorkItems ? "Track and manage delivery across all clients" : "View delivery status across all clients"}
-            </p>
-          </div>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-foreground">Work Items</h1>
           {!canEditWorkItems && (
-            <Badge variant="outline" className="bg-muted/50">
+            <Badge variant="outline" className="bg-muted/50 text-xs">
               <Eye className="h-3 w-3 mr-1" />
               View Only
             </Badge>
@@ -270,21 +265,22 @@ export default function WorkItems() {
         </div>
         {canEditWorkItems && (
           <Button 
+            size="sm"
             className="bg-accent hover:bg-accent/90 text-accent-foreground"
             onClick={handleAddWorkItem}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-1" />
             New Work Item
           </Button>
         )}
       </div>
 
-      {/* Status Filter Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      {/* Compact Status Filter */}
+      <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
         {[
           { key: "all", label: "All", color: "bg-muted" },
           { key: "Triage", label: "Triage", color: "bg-muted-foreground" },
-          { key: "In Progress", label: "In Progress", color: "bg-primary" },
+          { key: "In Progress", label: "Progress", color: "bg-primary" },
           { key: "Blocked", label: "Blocked", color: "bg-destructive" },
           { key: "Ready for Review", label: "Review", color: "bg-warning" },
           { key: "Client Review", label: "Client", color: "bg-accent" },
@@ -293,54 +289,51 @@ export default function WorkItems() {
           <button
             key={status.key}
             onClick={() => setStatusFilter(status.key as WorkItemStatus | "all")}
-            className={`p-2 rounded-lg border transition-all text-left ${
+            className={`p-2 rounded-lg border transition-all ${
               statusFilter === status.key 
-                ? "border-primary bg-primary/5 shadow-md" 
+                ? "border-primary bg-primary/5" 
                 : "border-border hover:border-primary/50 bg-card"
             }`}
           >
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${status.color}`} />
-              <span className="text-xs font-medium text-foreground">{status.label}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className={`w-1.5 h-1.5 rounded-full ${status.color}`} />
+                <span className="text-xs font-medium text-muted-foreground">{status.label}</span>
+              </div>
+              <span className="text-lg font-bold text-foreground">
+                {statusCounts[status.key as keyof typeof statusCounts]}
+              </span>
             </div>
-            <p className="text-lg font-bold text-foreground mt-1">
-              {statusCounts[status.key as keyof typeof statusCounts]}
-            </p>
           </button>
         ))}
       </div>
 
       {/* Search */}
-      <Card className="shadow-card">
-        <CardContent className="py-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by ID, client, or title..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="relative max-w-sm">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search work items..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-8 h-8 text-sm"
+        />
+      </div>
 
-      {/* Table View */}
+      {/* Compact Table View */}
       <Card className="shadow-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">ID</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Client</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Title</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Priority</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Risk</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Target</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Jira</th>
-                  <th className="py-3 px-4"></th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">ID</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Client</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Title</th>
+                  <th className="text-center py-2 px-3 text-xs font-medium text-muted-foreground">Pri</th>
+                  <th className="text-center py-2 px-3 text-xs font-medium text-muted-foreground">Risk</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Status</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Target</th>
+                  <th className="text-center py-2 px-3 text-xs font-medium text-muted-foreground">Jira</th>
                 </tr>
               </thead>
               <tbody>
@@ -350,55 +343,40 @@ export default function WorkItems() {
                     className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => handleViewDetails(item)}
                   >
-                    <td className="py-3 px-4">
-                      <span className="text-sm font-mono text-muted-foreground">{item.id}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs font-mono text-muted-foreground">{item.id}</span>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="text-sm font-medium text-foreground">{item.client}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs font-medium text-foreground">{item.client}</span>
                     </td>
-                    <td className="py-3 px-4 max-w-xs">
-                      <span className="text-sm text-foreground line-clamp-1">{item.title}</span>
-                      {item.riskReason && (
-                        <p className="text-xs text-muted-foreground italic mt-0.5 line-clamp-1">
-                          {item.riskReason}
-                        </p>
-                      )}
+                    <td className="py-2 px-3 max-w-[180px]">
+                      <span className="text-xs text-foreground line-clamp-1">{item.title}</span>
                     </td>
-                    <td className="py-3 px-4 text-center">
-                      <Badge className={getPriorityColor(item.priority)}>{item.priority}</Badge>
+                    <td className="py-2 px-3 text-center">
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${getPriorityColor(item.priority)}`}>
+                        {item.priority}
+                      </span>
                     </td>
-                    <td className="py-3 px-4 text-center">
-                      <Badge className={getRiskColor(item.risk)}>
+                    <td className="py-2 px-3 text-center">
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${getRiskColor(item.risk)}`}>
                         {item.risk.charAt(0).toUpperCase()}
-                      </Badge>
+                      </span>
                     </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline" className={getStatusColor(item.status)}>
+                    <td className="py-2 px-3">
+                      <span className={`text-xs px-1.5 py-0.5 rounded border ${getStatusColor(item.status)}`}>
                         {item.status}
-                      </Badge>
+                      </span>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="text-sm text-muted-foreground">{item.targetDate}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs text-muted-foreground">{item.targetDate}</span>
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-2 px-3 text-center">
                       {item.jiraLinks.length > 0 && (
-                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground">
                           <ExternalLink className="h-3 w-3" />
                           {item.jiraLinks.length}
                         </span>
                       )}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewDetails(item);
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -406,8 +384,8 @@ export default function WorkItems() {
             </table>
           </div>
           {filteredWorkItems.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No work items found matching your criteria.</p>
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground">No work items found.</p>
             </div>
           )}
         </CardContent>
