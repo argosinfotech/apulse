@@ -33,9 +33,7 @@ const clientFormSchema = z.object({
   accountType: z.enum(["Retainer", "Project", "Internal Product"]),
   revenueTier: z.enum(["High", "Med", "Low"]),
   health: z.enum(["green", "yellow", "red"]),
-  healthReason: z.string().max(200, "Reason must be less than 200 characters").optional(),
   updateFrequency: z.enum(["Daily", "Weekly", "Bi-weekly", "Monthly"]),
-  nextMilestone: z.string().max(100, "Milestone must be less than 100 characters").optional(),
 });
 
 export type ClientFormData = z.infer<typeof clientFormSchema>;
@@ -71,9 +69,7 @@ export function ClientFormModal({ open, onOpenChange, client, onSubmit }: Client
       accountType: client?.accountType || "Project",
       revenueTier: client?.revenueTier || "Med",
       health: client?.health || "green",
-      healthReason: client?.healthReason || "",
       updateFrequency: (client?.updateFrequency as ClientFormData["updateFrequency"]) || "Weekly",
-      nextMilestone: client?.nextMilestone || "",
     },
   });
 
@@ -210,38 +206,6 @@ export function ClientFormModal({ open, onOpenChange, client, onSubmit }: Client
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="healthReason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Health Reason (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Describe any health concerns or notes..."
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="nextMilestone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Next Milestone (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., MVP launch - Feb 28" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
