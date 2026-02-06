@@ -29,9 +29,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 export type IntakeStatus = "New" | "Need Client Info" | "Accepted" | "Rejected" | "Converted";
-export type IntakeType = "Bug" | "Feature" | "SEO" | "Content" | "Admin" | "Question";
-export type IntakeSource = "Email" | "Call" | "Meeting" | "WhatsApp";
-export type IntakeUrgency = "Low" | "Medium" | "High";
+export type IntakeType = "Bug" | "Feature" | "Enhancement" | "SEO" | "Content" | "Admin" | "Question";
+export type IntakeSource = "Email" | "Call" | "Meeting" | "WhatsApp" | "Slack";
+export type IntakeUrgency = "Low" | "Medium" | "High" | "Critical";
 
 export interface IntakeRequest {
   id: string;
@@ -49,9 +49,9 @@ export interface IntakeRequest {
 const intakeFormSchema = z.object({
   client: z.string().trim().min(1, "Client name is required").max(100),
   summary: z.string().trim().min(1, "Summary is required").max(500, "Summary must be less than 500 characters"),
-  type: z.enum(["Bug", "Feature", "SEO", "Content", "Admin", "Question"]),
-  source: z.enum(["Email", "Call", "Meeting", "WhatsApp"]),
-  urgency: z.enum(["Low", "Medium", "High"]),
+  type: z.enum(["Bug", "Feature", "Enhancement", "SEO", "Content", "Admin", "Question"]),
+  source: z.enum(["Email", "Call", "Meeting", "WhatsApp", "Slack"]),
+  urgency: z.enum(["Low", "Medium", "High", "Critical"]),
   clarifyingQuestions: z.string().max(500).optional(),
 });
 
@@ -168,6 +168,7 @@ export function IntakeFormModal({ open, onOpenChange, request, onSubmit }: Intak
                       <SelectContent>
                         <SelectItem value="Bug">Bug</SelectItem>
                         <SelectItem value="Feature">Feature</SelectItem>
+                        <SelectItem value="Enhancement">Enhancement</SelectItem>
                         <SelectItem value="SEO">SEO</SelectItem>
                         <SelectItem value="Content">Content</SelectItem>
                         <SelectItem value="Admin">Admin</SelectItem>
@@ -196,6 +197,7 @@ export function IntakeFormModal({ open, onOpenChange, request, onSubmit }: Intak
                         <SelectItem value="Call">Call</SelectItem>
                         <SelectItem value="Meeting">Meeting</SelectItem>
                         <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                        <SelectItem value="Slack">Slack</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -219,6 +221,7 @@ export function IntakeFormModal({ open, onOpenChange, request, onSubmit }: Intak
                         <SelectItem value="Low">Low</SelectItem>
                         <SelectItem value="Medium">Medium</SelectItem>
                         <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Critical">Critical</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
