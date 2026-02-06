@@ -13,8 +13,9 @@ import { IntakeRequest, IntakeStatus } from "./IntakeFormModal";
 const typeColors: Record<IntakeRequest["type"], string> = {
   Bug: "bg-destructive/10 text-destructive",
   Feature: "bg-primary/10 text-primary",
+  Enhancement: "bg-accent/10 text-accent",
   SEO: "bg-success/10 text-success",
-  Content: "bg-accent/10 text-accent",
+  Content: "bg-muted text-muted-foreground",
   Admin: "bg-muted text-muted-foreground",
   Question: "bg-warning/10 text-warning",
 };
