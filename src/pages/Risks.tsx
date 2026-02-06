@@ -1,27 +1,16 @@
-import { Plus, Search, AlertTriangle } from "lucide-react";
+import { useState } from "react";
+import { Plus, Search, AlertTriangle, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { canEdit as checkCanEdit } from "@/config/permissions";
+import { RiskFormModal, Risk, RiskType, Severity, RiskStatus } from "@/components/risks/RiskFormModal";
+import { RiskDetailModal } from "@/components/risks/RiskDetailModal";
+import { toast } from "@/hooks/use-toast";
 
-type RiskType = "Scope" | "Timeline" | "Tech" | "Client" | "Quality" | "Dependency";
-type Severity = "Low" | "Med" | "High";
-type RiskStatus = "Open" | "Mitigating" | "Resolved";
-
-interface Risk {
-  id: string;
-  workItemId: string;
-  workItemTitle: string;
-  client: string;
-  type: RiskType;
-  severity: Severity;
-  description: string;
-  mitigationPlan: string;
-  owner: string;
-  dueDate: string;
-  status: RiskStatus;
-}
-
-const risks: Risk[] = [
+const initialRisks: Risk[] = [
   {
     id: "R-001",
     workItemId: "WI-001",
@@ -32,8 +21,10 @@ const risks: Risk[] = [
     description: "Client unresponsive for 5 days, blocking API integration",
     mitigationPlan: "Escalate to primary contact, set deadline for response",
     owner: "DCOL",
-    dueDate: "Jan 18",
+    dueDate: "2025-01-18",
     status: "Open",
+    createdAt: "Jan 10, 2025",
+    updatedAt: "Jan 15, 2025",
   },
   {
     id: "R-002",
@@ -45,8 +36,10 @@ const risks: Risk[] = [
     description: "React Native optimization more complex than estimated",
     mitigationPlan: "Brought in senior developer for code review",
     owner: "DCOL",
-    dueDate: "Feb 1",
+    dueDate: "2025-02-01",
     status: "Mitigating",
+    createdAt: "Jan 12, 2025",
+    updatedAt: "Jan 14, 2025",
   },
   {
     id: "R-003",
@@ -58,24 +51,26 @@ const risks: Risk[] = [
     description: "Client review taking longer than planned",
     mitigationPlan: "Schedule call to walk through changes live",
     owner: "DCOL",
-    dueDate: "Jan 22",
+    dueDate: "2025-01-22",
     status: "Open",
+    createdAt: "Jan 8, 2025",
+    updatedAt: "Jan 16, 2025",
   },
 ];
 
-const severityColors: Record<Severity, string> = {
+const severityStyles: Record<Severity, string> = {
   High: "bg-destructive text-destructive-foreground",
   Med: "bg-warning text-warning-foreground",
   Low: "bg-muted text-muted-foreground",
 };
 
-const statusColors: Record<RiskStatus, string> = {
+const statusStyles: Record<RiskStatus, string> = {
   Open: "bg-destructive/10 text-destructive border-destructive/20",
   Mitigating: "bg-warning/10 text-warning border-warning/20",
   Resolved: "bg-success/10 text-success border-success/20",
 };
 
-const typeColors: Record<RiskType, string> = {
+const typeStyles: Record<RiskType, string> = {
   Scope: "bg-primary/10 text-primary",
   Timeline: "bg-warning/10 text-warning",
   Tech: "bg-accent/10 text-accent",
@@ -85,23 +80,107 @@ const typeColors: Record<RiskType, string> = {
 };
 
 export default function Risks() {
+  const { user } = useAuth();
+  const userCanEdit = user ? checkCanEdit(user.role, "risks") : false;
+
+  const [risks, setRisks] = useState<Risk[]>(initialRisks);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null);
+  const [editingRisk, setEditingRisk] = useState<Risk | null>(null);
+
+  const filteredRisks = risks.filter(
+    (risk) =>
+      risk.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      risk.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      risk.workItemTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      risk.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const openRisks = risks.filter((r) => r.status !== "Resolved");
   const highRisks = risks.filter((r) => r.severity === "High" && r.status !== "Resolved");
+  const mitigatingRisks = risks.filter((r) => r.status === "Mitigating");
+
+  const handleCreate = () => {
+    setEditingRisk(null);
+    setFormModalOpen(true);
+  };
+
+  const handleEdit = (risk: Risk) => {
+    setEditingRisk(risk);
+    setFormModalOpen(true);
+  };
+
+  const handleViewDetails = (risk: Risk) => {
+    setSelectedRisk(risk);
+    setDetailModalOpen(true);
+  };
+
+  const handleFormSubmit = (data: Omit<Risk, "id" | "createdAt" | "updatedAt">) => {
+    if (editingRisk) {
+      // Update existing
+      setRisks((prev) =>
+        prev.map((r) =>
+          r.id === editingRisk.id
+            ? { ...r, ...data, updatedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) }
+            : r
+        )
+      );
+      toast({ title: "Risk Updated", description: `${editingRisk.id} has been updated.` });
+    } else {
+      // Create new
+      const newRisk: Risk = {
+        ...data,
+        id: `R-${String(risks.length + 1).padStart(3, "0")}`,
+        createdAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        updatedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      };
+      setRisks((prev) => [newRisk, ...prev]);
+      toast({ title: "Risk Logged", description: `${newRisk.id} has been created.` });
+    }
+    setEditingRisk(null);
+  };
+
+  const handleDelete = (riskId: string) => {
+    setRisks((prev) => prev.filter((r) => r.id !== riskId));
+    toast({ title: "Risk Deleted", description: `${riskId} has been removed.`, variant: "destructive" });
+  };
+
+  const handleStatusChange = (riskId: string, status: RiskStatus) => {
+    setRisks((prev) =>
+      prev.map((r) =>
+        r.id === riskId
+          ? { ...r, status, updatedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) }
+          : r
+      )
+    );
+    setSelectedRisk((prev) => (prev?.id === riskId ? { ...prev, status } : prev));
+    toast({ title: "Status Updated", description: `Risk status changed to ${status}.` });
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Risks & Blockers</h1>
-          <p className="text-muted-foreground mt-1">
-            Track and mitigate project risks
-          </p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-foreground">Risks & Blockers</h1>
+            {!userCanEdit && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Eye className="h-3 w-3" />
+                View Only
+              </Badge>
+            )}
+          </div>
+          <p className="text-muted-foreground mt-1">Track and mitigate project risks</p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-          <Plus className="h-4 w-4 mr-2" />
-          Log Risk
-        </Button>
+        {userCanEdit && (
+          <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            Log Risk
+          </Button>
+        )}
       </div>
 
       {/* Summary Stats */}
@@ -139,9 +218,7 @@ export default function Risks() {
                 <AlertTriangle className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {risks.filter((r) => r.status === "Mitigating").length}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{mitigatingRisks.length}</p>
                 <p className="text-sm text-muted-foreground">Being Mitigated</p>
               </div>
             </div>
@@ -156,49 +233,80 @@ export default function Risks() {
             <CardTitle className="text-lg font-semibold">Risk Register</CardTitle>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search risks..." className="pl-10" />
+              <Input
+                placeholder="Search risks..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {risks.map((risk) => (
-            <div
-              key={risk.id}
-              className="p-4 rounded-lg bg-background border border-border hover:border-accent/30 transition-colors"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-muted-foreground">{risk.id}</span>
-                  <span className={`px-2 py-0.5 rounded text-xs font-semibold ${severityColors[risk.severity]}`}>
-                    {risk.severity}
-                  </span>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${typeColors[risk.type]}`}>
-                    {risk.type}
-                  </span>
-                </div>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[risk.status]}`}>
-                  {risk.status}
-                </span>
-              </div>
-
-              <h4 className="font-medium text-foreground mb-1">{risk.description}</h4>
-              <p className="text-sm text-muted-foreground mb-3">
-                {risk.client} • {risk.workItemTitle}
-              </p>
-
-              <div className="p-3 rounded-md bg-muted/50">
-                <p className="text-xs text-muted-foreground mb-1">Mitigation Plan:</p>
-                <p className="text-sm text-foreground">{risk.mitigationPlan}</p>
-              </div>
-
-              <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-                <span>Owner: {risk.owner}</span>
-                <span>Due: {risk.dueDate}</span>
-              </div>
+          {filteredRisks.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              {searchQuery ? "No risks match your search." : "No risks logged yet."}
             </div>
-          ))}
+          ) : (
+            filteredRisks.map((risk) => (
+              <div
+                key={risk.id}
+                onClick={() => handleViewDetails(risk)}
+                className="p-4 rounded-lg bg-background border border-border hover:border-accent/30 transition-colors cursor-pointer"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-muted-foreground">{risk.id}</span>
+                    <Badge className={severityStyles[risk.severity]}>{risk.severity}</Badge>
+                    <Badge variant="outline" className={typeStyles[risk.type]}>
+                      {risk.type}
+                    </Badge>
+                  </div>
+                  <Badge variant="outline" className={statusStyles[risk.status]}>
+                    {risk.status}
+                  </Badge>
+                </div>
+
+                <h4 className="font-medium text-foreground mb-1">{risk.description}</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {risk.client} • {risk.workItemTitle}
+                </p>
+
+                <div className="p-3 rounded-md bg-muted/50">
+                  <p className="text-xs text-muted-foreground mb-1">Mitigation Plan:</p>
+                  <p className="text-sm text-foreground">
+                    {risk.mitigationPlan || <span className="italic text-muted-foreground">Not defined</span>}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
+                  <span>Owner: {risk.owner}</span>
+                  <span>Due: {risk.dueDate}</span>
+                </div>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
+
+      {/* Form Modal */}
+      <RiskFormModal
+        open={formModalOpen}
+        onOpenChange={setFormModalOpen}
+        risk={editingRisk}
+        onSubmit={handleFormSubmit}
+      />
+
+      {/* Detail Modal */}
+      <RiskDetailModal
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        risk={selectedRisk}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
+        canEdit={userCanEdit}
+      />
     </div>
   );
 }
