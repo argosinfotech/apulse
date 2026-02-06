@@ -132,7 +132,7 @@ export default function Clients() {
       // Update existing client
       setClients(clients.map((c) =>
         c.id === editingClient.id
-          ? { ...c, ...data, nextMilestone: data.nextMilestone || "" }
+          ? { ...c, ...data }
           : c
       ));
       toast.success(`${data.name} has been updated`);
@@ -144,9 +144,9 @@ export default function Clients() {
         accountType: data.accountType,
         revenueTier: data.revenueTier,
         health: data.health,
-        healthReason: data.healthReason,
+        healthReason: "",
         lastTouch: "Just now",
-        nextMilestone: data.nextMilestone || "",
+        nextMilestone: "",
         updateFrequency: data.updateFrequency,
         activeWorkItems: 0,
         openEscalations: 0,
