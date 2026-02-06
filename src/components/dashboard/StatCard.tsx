@@ -43,33 +43,32 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "p-6 rounded-xl border shadow-card transition-all hover:shadow-soft",
+        "p-3 rounded-lg border shadow-card transition-all hover:shadow-soft",
         variantStyles[variant],
         className
       )}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className={cn("p-2.5 rounded-lg", iconStyles[variant])}>
-          <Icon className="h-5 w-5" />
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={cn("p-1.5 rounded", iconStyles[variant])}>
+            <Icon className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xl font-bold text-foreground leading-none">{value}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 truncate">{title}</p>
+          </div>
         </div>
         {trend && (
           <span
             className={cn(
-              "text-xs font-medium px-2 py-1 rounded-full",
+              "text-[10px] font-medium px-1.5 py-0.5 rounded-full whitespace-nowrap",
               trend.positive
                 ? "bg-success/10 text-success"
                 : "bg-destructive/10 text-destructive"
             )}
           >
-            {trend.positive ? "+" : ""}{trend.value}% {trend.label}
+            {trend.positive ? "+" : ""}{trend.value}%
           </span>
-        )}
-      </div>
-      <div>
-        <p className="text-3xl font-bold text-foreground">{value}</p>
-        <p className="text-sm text-muted-foreground mt-1">{title}</p>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground/70 mt-0.5">{subtitle}</p>
         )}
       </div>
     </div>
