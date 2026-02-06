@@ -1,4 +1,5 @@
-import { Download, TrendingUp, TrendingDown, Minus, Users, Briefcase, AlertTriangle, MessageSquareWarning } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Download, TrendingUp, TrendingDown, Minus, Users, Briefcase, AlertTriangle, MessageSquareWarning, History } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -51,111 +52,110 @@ const currentSnapshot: WeeklySnapshot = {
 };
 
 const TrendIcon = ({ trend }: { trend: "Up" | "Flat" | "Down" }) => {
-  if (trend === "Up") return <TrendingUp className="h-4 w-4 text-destructive" />;
-  if (trend === "Down") return <TrendingDown className="h-4 w-4 text-success" />;
-  return <Minus className="h-4 w-4 text-muted-foreground" />;
+  if (trend === "Up") return <TrendingUp className="h-3.5 w-3.5 text-destructive" />;
+  if (trend === "Down") return <TrendingDown className="h-3.5 w-3.5 text-success" />;
+  return <Minus className="h-3.5 w-3.5 text-muted-foreground" />;
 };
 
 export default function WeeklySnapshot() {
+  const navigate = useNavigate();
   const { metrics } = currentSnapshot;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Weekly Snapshot</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-xl font-bold text-foreground">Weekly Snapshot</h1>
+          <p className="text-sm text-muted-foreground">
             {currentSnapshot.week} • {currentSnapshot.dateRange}
           </p>
         </div>
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => navigate("/snapshot-history")}>
+            <History className="h-4 w-4 mr-1" />
+            History
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-1" />
+            Export
+          </Button>
+        </div>
       </div>
 
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Users className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{metrics.activeClients}</p>
-                <p className="text-xs text-muted-foreground">Active Clients</p>
-              </div>
+      {/* Key Metrics Grid - Compact */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-primary/10">
+              <Users className="h-4 w-4 text-primary" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{metrics.activeClients}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Active Clients</p>
+            </div>
+          </div>
         </Card>
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-accent/10">
-                <Briefcase className="h-4 w-4 text-accent" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{metrics.openWorkItems}</p>
-                <p className="text-xs text-muted-foreground">Open Work Items</p>
-              </div>
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-accent/10">
+              <Briefcase className="h-4 w-4 text-accent" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{metrics.openWorkItems}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Open Work Items</p>
+            </div>
+          </div>
         </Card>
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-destructive/10">
-                <AlertTriangle className="h-4 w-4 text-destructive" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{metrics.blockedWorkItems}</p>
-                <p className="text-xs text-muted-foreground">Blocked Items</p>
-              </div>
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-destructive/10">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{metrics.blockedWorkItems}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Blocked Items</p>
+            </div>
+          </div>
         </Card>
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-warning/10">
-                <MessageSquareWarning className="h-4 w-4 text-warning" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{metrics.decisionsPending}</p>
-                <p className="text-xs text-muted-foreground">Decisions Pending</p>
-              </div>
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-warning/10">
+              <MessageSquareWarning className="h-4 w-4 text-warning" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{metrics.decisionsPending}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Decisions Pending</p>
+            </div>
+          </div>
         </Card>
       </div>
 
-      {/* Health Overview & Backlog */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Health Overview & Backlog - Compact */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <Card className="shadow-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Client Health</CardTitle>
+          <CardHeader className="py-2 px-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Client Health</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm">
-                  <span className="w-3 h-3 rounded-full bg-success" />
+          <CardContent className="px-3 pb-3 pt-0">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-success" />
                   Healthy
                 </span>
                 <span className="font-semibold">{metrics.activeClients - metrics.redClients - metrics.yellowClients}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm">
-                  <span className="w-3 h-3 rounded-full bg-warning" />
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-warning" />
                   At Risk
                 </span>
                 <span className="font-semibold">{metrics.yellowClients}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm">
-                  <span className="w-3 h-3 rounded-full bg-destructive" />
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-destructive" />
                   Critical
                 </span>
                 <span className="font-semibold">{metrics.redClients}</span>
@@ -165,17 +165,17 @@ export default function WeeklySnapshot() {
         </Card>
 
         <Card className="shadow-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Request Pipeline</CardTitle>
+          <CardHeader className="py-2 px-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Request Pipeline</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Open Requests</span>
+          <CardContent className="px-3 pb-3 pt-0">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span>Open Requests</span>
                 <span className="font-semibold">{metrics.openRequests}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Escalations Raised</span>
+              <div className="flex items-center justify-between text-sm">
+                <span>Escalations</span>
                 <span className="font-semibold">{metrics.escalationsRaised}</span>
               </div>
             </div>
@@ -183,14 +183,14 @@ export default function WeeklySnapshot() {
         </Card>
 
         <Card className="shadow-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Backlog Trend</CardTitle>
+          <CardHeader className="py-2 px-3">
+            <CardTitle className="text-xs font-medium text-muted-foreground">Backlog Trend</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3">
+          <CardContent className="px-3 pb-3 pt-0">
+            <div className="flex items-center gap-2">
               <TrendIcon trend={metrics.backlogTrend} />
               <div>
-                <p className="font-semibold text-foreground">{metrics.backlogTrend}</p>
+                <p className="font-semibold text-sm text-foreground">{metrics.backlogTrend}</p>
                 <p className="text-xs text-muted-foreground">vs last week</p>
               </div>
             </div>
@@ -198,20 +198,20 @@ export default function WeeklySnapshot() {
         </Card>
       </div>
 
-      {/* Priorities and Commentary */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Priorities and Commentary - Compact */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="shadow-card">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold">Top 5 Priorities This Week</CardTitle>
+          <CardHeader className="py-2 px-3">
+            <CardTitle className="text-sm font-semibold">Top 5 Priorities</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ol className="space-y-3">
+          <CardContent className="px-3 pb-3 pt-0">
+            <ol className="space-y-1.5">
               {currentSnapshot.topPriorities.map((priority, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent/10 text-accent text-xs font-semibold shrink-0">
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="flex items-center justify-center w-5 h-5 rounded bg-accent/10 text-accent text-xs font-semibold shrink-0">
                     {idx + 1}
                   </span>
-                  <span className="text-sm text-foreground">{priority}</span>
+                  <span className="text-sm text-foreground leading-tight">{priority}</span>
                 </li>
               ))}
             </ol>
@@ -219,15 +219,15 @@ export default function WeeklySnapshot() {
         </Card>
 
         <Card className="shadow-card">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold">DCOL Commentary</CardTitle>
+          <CardHeader className="py-2 px-3">
+            <CardTitle className="text-sm font-semibold">DCOL Commentary</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
+          <CardContent className="px-3 pb-3 pt-0">
+            <ul className="space-y-1.5">
               {currentSnapshot.commentary.map((comment, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground mt-2 shrink-0" />
-                  <span className="text-sm text-muted-foreground">{comment}</span>
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground mt-1.5 shrink-0" />
+                  <span className="text-sm text-muted-foreground leading-tight">{comment}</span>
                 </li>
               ))}
             </ul>
