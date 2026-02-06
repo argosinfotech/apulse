@@ -173,91 +173,85 @@ export default function Risks() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-foreground">Risks & Blockers</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-foreground">Risks & Blockers</h1>
             {!userCanEdit && (
-              <Badge variant="secondary" className="flex items-center gap-1">
+              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
                 <Eye className="h-3 w-3" />
                 View Only
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1">Track and mitigate project risks</p>
+          <p className="text-sm text-muted-foreground">Track and mitigate project risks</p>
         </div>
         {userCanEdit && (
-          <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleCreate}>
+            <Plus className="h-4 w-4 mr-1" />
             Log Risk
           </Button>
         )}
       </div>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-destructive/10">
-                <AlertTriangle className="h-5 w-5 text-destructive" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{highRisks.length}</p>
-                <p className="text-sm text-muted-foreground">High Severity</p>
-              </div>
+      {/* Summary Stats - Compact */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-destructive/10">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{highRisks.length}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">High Severity</p>
+            </div>
+          </div>
         </Card>
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-warning/10">
-                <AlertTriangle className="h-5 w-5 text-warning" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{openRisks.length}</p>
-                <p className="text-sm text-muted-foreground">Open Risks</p>
-              </div>
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-warning/10">
+              <AlertTriangle className="h-4 w-4 text-warning" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{openRisks.length}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Open Risks</p>
+            </div>
+          </div>
         </Card>
-        <Card className="shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-success/10">
-                <AlertTriangle className="h-5 w-5 text-success" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{mitigatingRisks.length}</p>
-                <p className="text-sm text-muted-foreground">Being Mitigated</p>
-              </div>
+        <Card className="shadow-card p-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-success/10">
+              <AlertTriangle className="h-4 w-4 text-success" />
             </div>
-          </CardContent>
+            <div>
+              <p className="text-xl font-bold text-foreground leading-none">{mitigatingRisks.length}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Mitigating</p>
+            </div>
+          </div>
         </Card>
       </div>
 
       {/* Risk Register */}
       <Card className="shadow-card">
-        <CardHeader className="pb-4">
+        <CardHeader className="py-3 px-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Risk Register</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-base font-semibold">Risk Register</CardTitle>
+            <div className="relative w-56">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
                 placeholder="Search risks..."
-                className="pl-10"
+                className="pl-8 h-8 text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="px-4 pb-4 pt-0 space-y-2">
           {filteredRisks.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-8 text-muted-foreground text-sm">
               {searchQuery ? "No risks match your search." : "No risks logged yet."}
             </div>
           ) : (
@@ -265,36 +259,37 @@ export default function Risks() {
               <div
                 key={risk.id}
                 onClick={() => handleViewDetails(risk)}
-                className="p-4 rounded-lg bg-background border border-border hover:border-accent/30 transition-colors cursor-pointer"
+                className="p-3 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-muted-foreground">{risk.id}</span>
-                    <Badge className={severityStyles[risk.severity]}>{risk.severity}</Badge>
-                    <Badge variant="outline" className={typeStyles[risk.type]}>
+                    <Badge className={`${severityStyles[risk.severity]} text-xs px-1.5 py-0`}>{risk.severity}</Badge>
+                    <Badge variant="outline" className={`${typeStyles[risk.type]} text-xs px-1.5 py-0`}>
                       {risk.type}
                     </Badge>
                   </div>
-                  <Badge variant="outline" className={statusStyles[risk.status]}>
+                  <Badge variant="outline" className={`${statusStyles[risk.status]} text-xs px-1.5 py-0`}>
                     {risk.status}
                   </Badge>
                 </div>
 
-                <h4 className="font-medium text-foreground mb-1">{risk.description}</h4>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="font-medium text-sm text-foreground line-clamp-1">{risk.description}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {risk.client} • {risk.workItemTitle}
                 </p>
 
-                <div className="p-3 rounded-md bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Mitigation Plan:</p>
-                  <p className="text-sm text-foreground">
-                    {risk.mitigationPlan || <span className="italic text-muted-foreground">Not defined</span>}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-                  <span>Owner: {risk.owner}</span>
-                  <span>Due: {risk.dueDate}</span>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-border">
+                  <div className="flex-1 min-w-0 pr-4">
+                    <p className="text-[10px] text-muted-foreground">Mitigation:</p>
+                    <p className="text-xs text-foreground line-clamp-1">
+                      {risk.mitigationPlan || <span className="italic text-muted-foreground">Not defined</span>}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                    <span>{risk.owner}</span>
+                    <span>Due {risk.dueDate}</span>
+                  </div>
                 </div>
               </div>
             ))
