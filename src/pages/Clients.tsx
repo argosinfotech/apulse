@@ -1,25 +1,29 @@
 import { useState } from "react";
-import { Plus, Search, Filter, MoreHorizontal, ExternalLink } from "lucide-react";
+import { Plus, Search, MoreHorizontal, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusBadge, HealthStatus } from "@/components/ui/status-badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ClientFormModal, Client, ClientFormData } from "@/components/clients/ClientFormModal";
+import { toast } from "sonner";
 
-interface Client {
-  id: string;
-  name: string;
-  accountType: "Retainer" | "Project" | "Internal Product";
-  revenueTier: "High" | "Med" | "Low";
-  health: HealthStatus;
-  healthReason?: string;
-  lastTouch: string;
-  nextMilestone: string;
-  updateFrequency: string;
-  activeWorkItems: number;
-  openEscalations: number;
-}
-
-const clients: Client[] = [
+const initialClients: Client[] = [
   {
     id: "C-001",
     name: "Stephengould",
@@ -85,14 +89,72 @@ const clients: Client[] = [
 ];
 
 export default function Clients() {
+  const [clients, setClients] = useState<Client[]>(initialClients);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterHealth, setFilterHealth] = useState<HealthStatus | "all">("all");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
 
   const filteredClients = clients.filter((client) => {
     const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesHealth = filterHealth === "all" || client.health === filterHealth;
     return matchesSearch && matchesHealth;
   });
+
+  const handleAddClient = () => {
+    setEditingClient(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteClick = (client: Client) => {
+    setClientToDelete(client);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (clientToDelete) {
+      setClients(clients.filter((c) => c.id !== clientToDelete.id));
+      toast.success(`${clientToDelete.name} has been deleted`);
+      setClientToDelete(null);
+    }
+    setDeleteDialogOpen(false);
+  };
+
+  const handleFormSubmit = (data: ClientFormData) => {
+    if (editingClient) {
+      // Update existing client
+      setClients(clients.map((c) =>
+        c.id === editingClient.id
+          ? { ...c, ...data, nextMilestone: data.nextMilestone || "" }
+          : c
+      ));
+      toast.success(`${data.name} has been updated`);
+    } else {
+      // Create new client
+      const newClient: Client = {
+        id: `C-${String(clients.length + 1).padStart(3, "0")}`,
+        name: data.name,
+        accountType: data.accountType,
+        revenueTier: data.revenueTier,
+        health: data.health,
+        healthReason: data.healthReason,
+        lastTouch: "Just now",
+        nextMilestone: data.nextMilestone || "",
+        updateFrequency: data.updateFrequency,
+        activeWorkItems: 0,
+        openEscalations: 0,
+      };
+      setClients([...clients, newClient]);
+      toast.success(`${data.name} has been added`);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -104,7 +166,10 @@ export default function Clients() {
             Manage client relationships and health status
           </p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+        <Button 
+          className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          onClick={handleAddClient}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Client
         </Button>
@@ -223,9 +288,26 @@ export default function Clients() {
                       )}
                     </td>
                     <td className="py-4 px-4">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditClient(client)}>
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDeleteClick(client)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))}
@@ -234,6 +316,35 @@ export default function Clients() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Client Form Modal */}
+      <ClientFormModal
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        client={editingClient}
+        onSubmit={handleFormSubmit}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Client</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {clientToDelete?.name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
