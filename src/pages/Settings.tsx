@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { DCOLManagement } from "@/components/settings/DCOLManagement";
 
 export default function Settings() {
   const { user, logout } = useAuth();
@@ -117,6 +118,9 @@ export default function Settings() {
           </div>
         </CardContent>
       </Card>
+
+      {/* DCOL Management - Founder Only */}
+      {user?.role === "founder" && <DCOLManagement />}
 
       {/* Security */}
       <Card className="shadow-card">
