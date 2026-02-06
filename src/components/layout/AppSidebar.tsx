@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Users,
-  Inbox,
-  Briefcase,
-  AlertTriangle,
-  MessageSquareWarning,
-  MessageCircle,
-  Receipt,
-  Calendar,
   ChevronLeft,
   ChevronRight,
   Settings,
@@ -19,36 +10,16 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
+import { getNavItemsForRole } from "@/config/permissions";
 import logo from "@/assets/logo.svg";
-
-interface NavItem {
-  title: string;
-  url: string;
-  icon: React.ElementType;
-  badge?: number;
-}
-
-const mainNavItems: NavItem[] = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Clients", url: "/clients", icon: Users },
-  { title: "Intake Requests", url: "/intake", icon: Inbox, badge: 3 },
-  { title: "Work Items", url: "/work-items", icon: Briefcase },
-  { title: "Risks & Blockers", url: "/risks", icon: AlertTriangle, badge: 2 },
-  { title: "Escalations", url: "/escalations", icon: MessageSquareWarning, badge: 1 },
-  { title: "Communications", url: "/communications", icon: MessageCircle },
-  { title: "Billing", url: "/billing", icon: Receipt },
-  { title: "Weekly Snapshot", url: "/snapshot", icon: Calendar },
-];
-
-const bottomNavItems: NavItem[] = [
-  { title: "Settings", url: "/settings", icon: Settings },
-];
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, switchRole } = useAuth();
+
+  const navItems = user ? getNavItemsForRole(user.role) : [];
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -105,8 +76,8 @@ export function AppSidebar() {
                 className={cn(
                   "text-xs capitalize border-sidebar-border",
                   user?.role === "founder" 
-                    ? "bg-amber-500/20 text-amber-200 border-amber-500/30" 
-                    : "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
+                    ? "bg-warning/20 text-warning border-warning/30" 
+                    : "bg-success/20 text-success border-success/30"
                 )}
               >
                 {user?.role}
@@ -119,7 +90,7 @@ export function AppSidebar() {
       {/* Main Navigation */}
       <nav className="flex-1 py-4 overflow-y-auto">
         <ul className="space-y-1 px-2">
-          {mainNavItems.map((item) => (
+          {navItems.map((item) => (
             <li key={item.title}>
               <NavLink
                 to={item.url}
@@ -153,22 +124,6 @@ export function AppSidebar() {
       {/* Bottom Navigation */}
       <div className="py-4 border-t border-sidebar-border">
         <ul className="space-y-1 px-2">
-          {bottomNavItems.map((item) => (
-            <li key={item.title}>
-              <NavLink
-                to={item.url}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                  isActive(item.url)
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-                )}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {!collapsed && <span className="truncate">{item.title}</span>}
-              </NavLink>
-            </li>
-          ))}
           <li>
             <button
               onClick={handleSwitchRole}
