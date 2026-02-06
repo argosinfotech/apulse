@@ -142,95 +142,82 @@ export function DCOLDashboard() {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       {/* Header with Quick Action */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Daily Control Board</h1>
-          <p className="text-sm text-muted-foreground">
-            Operational overview — intake, active work, and escalations
-          </p>
-        </div>
+        <h1 className="text-xl font-bold text-foreground">Daily Control Board</h1>
         <Button 
           size="sm"
-          className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          className="bg-accent hover:bg-accent/90 text-accent-foreground h-7 text-xs"
           onClick={() => setIntakeFormOpen(true)}
         >
-          <Plus className="h-4 w-4 mr-1" />
+          <Plus className="h-3.5 w-3.5 mr-1" />
           New Request
         </Button>
       </div>
 
-      {/* Stats Row - More Compact */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      {/* Stats Row */}
+      <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Intake Queue"
           value="3"
-          subtitle="Pending triage"
           icon={Inbox}
           trend={{ value: 2, label: "new today", positive: false }}
           variant="warning"
         />
         <StatCard
-          title="Active Work Items"
+          title="Active Work"
           value="12"
-          subtitle="In progress"
           icon={Briefcase}
           variant="default"
         />
         <StatCard
-          title="Blocked Items"
+          title="Blocked"
           value="2"
-          subtitle="Needs attention"
           icon={AlertTriangle}
           trend={{ value: 1, label: "from yesterday", positive: false }}
           variant="destructive"
         />
         <StatCard
-          title="Pending Escalations"
+          title="Escalations"
           value="2"
-          subtitle="Awaiting review"
           icon={MessageSquareWarning}
           variant="accent"
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3">
         {/* Intake Queue */}
         <Card className="shadow-card">
-          <CardHeader className="py-3 px-4">
+          <CardHeader className="py-2 px-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Inbox className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <Inbox className="h-3.5 w-3.5 text-muted-foreground" />
                 Intake Queue
               </CardTitle>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs h-7"
+                className="text-xs h-6 px-2"
                 onClick={() => navigate("/intake")}
               >
                 View All
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="px-4 pb-3 pt-0 space-y-2">
+          <CardContent className="px-3 pb-2 pt-0 space-y-1.5">
             {intakeQueue.map((item) => (
               <div
                 key={item.id}
                 onClick={() => navigate("/intake")}
-                className="p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                className="p-2 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <Badge className={`${getUrgencyColor(item.urgency)} text-xs px-1.5 py-0`}>{item.urgency}</Badge>
-                  <span className="text-xs text-muted-foreground">{item.receivedAt}</span>
+                  <span className={`${getUrgencyColor(item.urgency)} text-[10px] px-1 py-0.5 rounded`}>{item.urgency}</span>
+                  <span className="text-[10px] text-muted-foreground">{item.receivedAt}</span>
                 </div>
-                <p className="font-medium text-sm text-foreground line-clamp-1">{item.summary}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-xs text-muted-foreground">{item.client}</span>
-                  <span className="text-xs text-muted-foreground">•</span>
-                  <span className="text-xs text-muted-foreground">{item.type}</span>
-                </div>
+                <p className="font-medium text-xs text-foreground line-clamp-1">{item.summary}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{item.client} • {item.type}</p>
               </div>
             ))}
           </CardContent>
@@ -238,37 +225,37 @@ export function DCOLDashboard() {
 
         {/* Active Work Items */}
         <Card className="shadow-card">
-          <CardHeader className="py-3 px-4">
+          <CardHeader className="py-2 px-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
                 Active Work
               </CardTitle>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs h-7"
+                className="text-xs h-6 px-2"
                 onClick={() => navigate("/work-items")}
               >
                 View All
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="px-4 pb-3 pt-0 space-y-2">
+          <CardContent className="px-3 pb-2 pt-0 space-y-1.5">
             {activeWorkItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => navigate("/work-items")}
-                className="p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                className="p-2 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-mono text-muted-foreground">{item.id}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">{item.id}</span>
                   {getStatusBadge(item.status)}
                 </div>
-                <p className="font-medium text-sm text-foreground line-clamp-1">{item.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{item.client} • Due {item.dueDate}</p>
-                <div className="mt-1.5">
-                  <div className="flex items-center justify-between text-xs mb-0.5">
+                <p className="font-medium text-xs text-foreground line-clamp-1">{item.title}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{item.client} • Due {item.dueDate}</p>
+                <div className="mt-1">
+                  <div className="flex items-center justify-between text-[10px] mb-0.5">
                     <span className="text-muted-foreground">Progress</span>
                     <span className="font-medium">{item.progress}%</span>
                   </div>
@@ -281,57 +268,56 @@ export function DCOLDashboard() {
 
         {/* Escalations */}
         <Card className="shadow-card">
-          <CardHeader className="py-3 px-4">
+          <CardHeader className="py-2 px-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <MessageSquareWarning className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <MessageSquareWarning className="h-3.5 w-3.5 text-muted-foreground" />
                 Escalations
               </CardTitle>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-xs h-7"
+                className="text-xs h-6 px-2"
                 onClick={() => navigate("/escalations")}
               >
                 View All
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="px-4 pb-3 pt-0 space-y-2">
+          <CardContent className="px-3 pb-2 pt-0 space-y-1.5">
             {escalations.map((esc) => (
               <div
                 key={esc.id}
                 onClick={() => navigate("/escalations")}
-                className="p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                className="p-2 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-mono text-muted-foreground">{esc.id}</span>
-                  <Badge 
-                    variant="outline" 
-                    className={`text-xs px-1.5 py-0 ${
+                  <span className="text-[10px] font-mono text-muted-foreground">{esc.id}</span>
+                  <span 
+                    className={`text-[10px] px-1 py-0.5 rounded ${
                       esc.status === "pending_approval" 
-                        ? "bg-warning/10 text-warning border-warning/30" 
-                        : "bg-muted"
+                        ? "bg-warning/10 text-warning" 
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {esc.status === "pending_approval" ? "Pending" : "Draft"}
-                  </Badge>
+                  </span>
                 </div>
-                <p className="font-medium text-sm text-foreground">{esc.client}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{esc.issue}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Clock className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">{esc.createdAt}</span>
+                <p className="font-medium text-xs text-foreground">{esc.client}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{esc.issue}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <Clock className="h-2.5 w-2.5 text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground">{esc.createdAt}</span>
                 </div>
               </div>
             ))}
             <Button 
               variant="ghost" 
               size="sm" 
-              className="w-full mt-1 h-7 text-xs"
+              className="w-full mt-1 h-6 text-[10px]"
               onClick={() => navigate("/escalations")}
             >
-              <CheckCircle2 className="h-3 w-3 mr-1" />
+              <CheckCircle2 className="h-2.5 w-2.5 mr-1" />
               Submit for Approval
             </Button>
           </CardContent>
