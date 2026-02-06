@@ -9,6 +9,8 @@ import { DCOLProvider } from "@/contexts/DCOLContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Login from "./pages/Login";
+import LoginFounder from "./pages/LoginFounder";
+import LoginDCOL from "./pages/LoginDCOL";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
@@ -38,6 +40,8 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/login/founder" element={<LoginFounder />} />
+              <Route path="/login/dcol" element={<LoginDCOL />} />
               <Route
                 element={
                   <ProtectedRoute>
