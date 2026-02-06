@@ -11,6 +11,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
+import ClientDetail from "./pages/ClientDetail";
 import IntakeRequests from "./pages/IntakeRequests";
 import WorkItems from "./pages/WorkItems";
 import Risks from "./pages/Risks";
@@ -46,6 +47,7 @@ const App = () => (
               >
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/clients" element={<Clients />} />
+                <Route path="/clients/:clientId" element={<ClientDetail />} />
                 <Route path="/intake" element={<IntakeRequests />} />
                 <Route path="/work-items" element={<WorkItems />} />
                 <Route path="/risks" element={<Risks />} />

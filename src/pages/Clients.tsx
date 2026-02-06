@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Plus, Search, MoreHorizontal, ExternalLink, Pencil, Trash2, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,7 @@ const initialClients: Client[] = [
 ];
 
 export default function Clients() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const canEditClients = user ? canEdit(user.role, "clients") : false;
   
@@ -266,7 +268,8 @@ export default function Clients() {
                 {filteredClients.map((client) => (
                   <tr
                     key={client.id}
-                    className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                    className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/clients/${client.id}`)}
                   >
                     <td className="py-4 px-4">
                       <StatusBadge status={client.health} />
@@ -303,7 +306,7 @@ export default function Clients() {
                         <span className="text-muted-foreground">—</span>
                       )}
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
                       {canEditClients ? (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -312,6 +315,10 @@ export default function Clients() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/clients/${client.id}`)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleEditClient(client)}>
                               <Pencil className="h-4 w-4 mr-2" />
                               Edit
@@ -326,7 +333,7 @@ export default function Clients() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       ) : (
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/clients/${client.id}`)}>
                           <Eye className="h-4 w-4 mr-1" />
                           View
                         </Button>
