@@ -7,7 +7,6 @@ import {
   AlertTriangle,
   MessageSquareWarning,
   MessageCircle,
-  Receipt,
   Calendar,
   Settings,
 } from "lucide-react";
@@ -28,7 +27,6 @@ export type Module =
   | "risks"
   | "escalations"
   | "communications"
-  | "billing"
   | "snapshot"
   | "settings";
 
@@ -54,7 +52,6 @@ export const rolePermissions: Record<UserRole, RoleConfig> = {
       risks: ["view", "create", "edit", "delete"],
       escalations: ["view", "create", "edit"], // draft, recommend
       communications: ["view", "create", "edit", "delete"],
-      billing: ["view", "mark_ready"],
       snapshot: ["view", "create"], // generate
       settings: [], // no access
     },
@@ -70,7 +67,6 @@ export const rolePermissions: Record<UserRole, RoleConfig> = {
       risks: ["view"],
       escalations: ["view", "approve"],
       communications: ["view"],
-      billing: ["view", "approve"],
       snapshot: ["view"],
       settings: ["view", "create", "edit", "delete"],
     },
@@ -93,7 +89,6 @@ export const allNavItems: NavItem[] = [
   { title: "Risks & Blockers", url: "/risks", icon: AlertTriangle, badge: 2, module: "risks" },
   { title: "Escalations", url: "/escalations", icon: MessageSquareWarning, badge: 1, module: "escalations" },
   { title: "Communications", url: "/communications", icon: MessageCircle, module: "communications" },
-  { title: "Billing", url: "/billing", icon: Receipt, module: "billing" },
   { title: "Weekly Snapshot", url: "/snapshot", icon: Calendar, module: "snapshot" },
   { title: "Settings", url: "/settings", icon: Settings, module: "settings" },
 ];
