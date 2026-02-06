@@ -62,6 +62,32 @@ const initialRequests: IntakeRequest[] = [
     intakeDate: "2024-01-12",
     daysOld: 3,
     clarifyingQuestions: "What date range and format do they need?",
+    notes: [
+      {
+        id: "note-1",
+        text: "Emailed client asking about date range requirements and preferred export format (CSV vs Excel)",
+        author: "Sarah Chen",
+        createdAt: "Jan 12, 2024, 2:30 PM",
+      },
+      {
+        id: "note-2",
+        text: "Client responded - they need last 90 days, CSV format. Also want to filter by user segments.",
+        author: "Sarah Chen",
+        createdAt: "Jan 13, 2024, 10:15 AM",
+        attachment: {
+          id: "att-1",
+          name: "client-requirements.pdf",
+          size: "245 KB",
+          type: "application/pdf",
+        },
+      },
+      {
+        id: "note-3",
+        text: "Followed up on segment definitions - waiting for their user segment list",
+        author: "Sarah Chen",
+        createdAt: "Jan 14, 2024, 9:00 AM",
+      },
+    ],
   },
   {
     id: "IR-004",
