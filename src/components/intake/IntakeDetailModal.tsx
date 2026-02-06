@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -17,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Clock, User, MessageSquare, Tag, ArrowRight, Pencil, Trash2, Send, Plus, Paperclip, X, FileText, Image, File } from "lucide-react";
+import { Calendar, Clock, User, MessageSquare, Tag, ArrowRight, Pencil, Trash2, Send, Plus, Paperclip, X, FileText, Image, File, Building2, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface IntakeDetailModalProps {
@@ -131,249 +130,245 @@ export function IntakeDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold">{request.id}</DialogTitle>
-            <Badge variant="outline" className={getStatusColor(request.status)}>
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto p-0">
+        {/* Header */}
+        <DialogHeader className="px-4 py-3 border-b border-border bg-muted/30">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-mono text-muted-foreground">{request.id}</span>
+                <Badge variant="outline" className={getTypeColor(request.type)}>
+                  {request.type}
+                </Badge>
+                <Badge className={`${getUrgencyColor(request.urgency)} text-xs`}>
+                  {request.urgency}
+                </Badge>
+              </div>
+              <DialogTitle className="text-base font-semibold leading-tight">{request.summary}</DialogTitle>
+            </div>
+            <Badge variant="outline" className={`${getStatusColor(request.status)} shrink-0`}>
               {request.status}
             </Badge>
           </div>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Summary */}
-          <div>
-            <h3 className="text-base font-medium text-foreground">{request.summary}</h3>
-          </div>
-
-          <Separator />
-
-          {/* Details Grid */}
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Client:</span>
-              <span className="font-medium text-foreground">{request.client}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Tag className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Type:</span>
-              <Badge variant="outline" className={getTypeColor(request.type)}>
-                {request.type}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Source:</span>
-              <span className="font-medium text-foreground">{request.source}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Age:</span>
-              <span className="font-medium text-foreground">{request.daysOld} days</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Received:</span>
-              <span className="font-medium text-foreground">{request.intakeDate}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">Urgency:</span>
-              <Badge className={getUrgencyColor(request.urgency)}>
-                {request.urgency}
-              </Badge>
-            </div>
-          </div>
-
-          {/* Notes Thread */}
-          <Separator />
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-foreground">Activity Notes</h4>
-              {canEdit && !showNoteInput && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowNoteInput(true)}
-                >
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Note
-                </Button>
-              )}
-            </div>
-
-            {/* Add Note Input */}
-            {showNoteInput && canEdit && (
-              <div className="mb-3 space-y-2 p-3 rounded-lg border border-border bg-muted/30">
-                <Textarea
-                  placeholder="Add a note (e.g., 'Asked client for date range requirements via email')"
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  className="resize-none bg-background"
-                  rows={2}
-                />
-                
-                {/* File Attachment */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
-                />
-                
-                {selectedFile ? (
-                  <div className="flex items-center gap-2 p-2 rounded bg-background border border-border">
-                    <Paperclip className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-foreground flex-1 truncate">{selectedFile.name}</span>
-                    <span className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6"
-                      onClick={handleRemoveFile}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Paperclip className="h-3 w-3 mr-1" />
-                    Attach File
-                  </Button>
-                )}
-
-                <div className="flex items-center gap-2 pt-1">
-                  <Button 
-                    size="sm" 
-                    onClick={handleAddNote} 
-                    disabled={!newNote.trim() && !selectedFile}
-                  >
-                    <Send className="h-3 w-3 mr-1" />
-                    Add Note
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    onClick={() => {
-                      setShowNoteInput(false);
-                      setNewNote("");
-                      setSelectedFile(null);
-                    }}
-                  >
-                    Cancel
-                  </Button>
+        <div className="p-4 space-y-4">
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Left Column - Details */}
+            <div className="space-y-3">
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground text-xs">Client</span>
+                  <span className="font-medium text-foreground ml-auto">{request.client}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground text-xs">Source</span>
+                  <span className="font-medium text-foreground ml-auto">{request.source}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground text-xs">Received</span>
+                  <span className="font-medium text-foreground ml-auto">{request.intakeDate}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground text-xs">Age</span>
+                  <span className="font-medium text-foreground ml-auto">{request.daysOld} days</span>
                 </div>
               </div>
-            )}
 
-            {/* Notes List */}
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {request.notes && request.notes.length > 0 ? (
-                request.notes.map((note) => {
-                  const FileIcon = note.attachment ? getFileIcon(note.attachment.type) : File;
-                  return (
-                    <div 
-                      key={note.id} 
-                      className="p-3 rounded-lg bg-muted/50 text-sm"
-                    >
-                      {note.text && (
-                        <p className="text-foreground">{note.text}</p>
-                      )}
-                      {note.attachment && (
-                        <div className="flex items-center gap-2 mt-2 p-2 rounded bg-background border border-border">
-                          <FileIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-foreground flex-1 truncate">
-                            {note.attachment.name}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {note.attachment.size}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <span>{note.author}</span>
-                        <span>•</span>
-                        <span>{note.createdAt}</span>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-sm text-muted-foreground italic">No notes yet</p>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          {canEdit && request.status !== "Converted" && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                {/* Status Change */}
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">Change Status:</span>
+              {/* Status Change */}
+              {canEdit && request.status !== "Converted" && (
+                <div className="pt-2 border-t border-border">
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Change Status</p>
                   <Select
                     value={request.status}
                     onValueChange={(value) => onStatusChange(request, value as IntakeStatus)}
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="h-8 text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
+                        <SelectItem key={status} value={status} className="text-xs">{status}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+              )}
+            </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-2">
-                  {request.status === "Accepted" && (
-                    <Button
-                      onClick={() => {
-                        onConvert(request);
-                        onOpenChange(false);
-                      }}
-                      className="bg-success hover:bg-success/90"
-                    >
-                      <ArrowRight className="h-4 w-4 mr-2" />
-                      Convert to Work Item
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      onEdit(request);
-                      onOpenChange(false);
-                    }}
+            {/* Right Column - Notes */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <MessageSquare className="h-3 w-3" />
+                  Activity Notes
+                </p>
+                {canEdit && !showNoteInput && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-6 text-xs px-2"
+                    onClick={() => setShowNoteInput(true)}
                   >
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="text-destructive hover:bg-destructive/10"
-                    onClick={() => {
-                      onDelete(request);
-                      onOpenChange(false);
-                    }}
+                )}
+              </div>
+
+              {/* Notes List */}
+              <div className="space-y-1.5 max-h-32 overflow-y-auto">
+                {request.notes && request.notes.length > 0 ? (
+                  request.notes.map((note) => {
+                    const FileIcon = note.attachment ? getFileIcon(note.attachment.type) : File;
+                    return (
+                      <div 
+                        key={note.id} 
+                        className="p-2 rounded bg-muted/50 text-xs border border-border"
+                      >
+                        {note.text && (
+                          <p className="text-foreground">{note.text}</p>
+                        )}
+                        {note.attachment && (
+                          <div className="flex items-center gap-1.5 mt-1.5 p-1.5 rounded bg-background border border-border">
+                            <FileIcon className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-foreground flex-1 truncate">
+                              {note.attachment.name}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1.5 mt-1 text-[10px] text-muted-foreground">
+                          <span>{note.author}</span>
+                          <span>•</span>
+                          <span>{note.createdAt}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">No notes yet</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Add Note Input - Full Width */}
+          {showNoteInput && canEdit && (
+            <div className="space-y-2 p-3 rounded border border-border bg-muted/30">
+              <Textarea
+                placeholder="Add a note..."
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                className="resize-none bg-background text-xs min-h-[60px]"
+                rows={2}
+              />
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
+              />
+              
+              {selectedFile ? (
+                <div className="flex items-center gap-2 p-2 rounded bg-background border border-border">
+                  <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs text-foreground flex-1 truncate">{selectedFile.name}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-5 w-5"
+                    onClick={handleRemoveFile}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    <X className="h-3 w-3" />
                   </Button>
                 </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Paperclip className="h-3 w-3 mr-1" />
+                  Attach
+                </Button>
+              )}
+
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="sm" 
+                  className="h-7 text-xs"
+                  onClick={handleAddNote} 
+                  disabled={!newNote.trim() && !selectedFile}
+                >
+                  <Send className="h-3 w-3 mr-1" />
+                  Add Note
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setShowNoteInput(false);
+                    setNewNote("");
+                    setSelectedFile(null);
+                  }}
+                >
+                  Cancel
+                </Button>
               </div>
-            </>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          {canEdit && request.status !== "Converted" && (
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+              {request.status === "Accepted" && (
+                <Button
+                  size="sm"
+                  className="h-7 text-xs bg-success hover:bg-success/90"
+                  onClick={() => {
+                    onConvert(request);
+                    onOpenChange(false);
+                  }}
+                >
+                  <ArrowRight className="h-3 w-3 mr-1" />
+                  Convert to Work Item
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => {
+                  onEdit(request);
+                  onOpenChange(false);
+                }}
+              >
+                <Pencil className="h-3 w-3 mr-1" />
+                Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  onDelete(request);
+                  onOpenChange(false);
+                }}
+              >
+                <Trash2 className="h-3 w-3 mr-1" />
+                Delete
+              </Button>
+            </div>
           )}
         </div>
       </DialogContent>
