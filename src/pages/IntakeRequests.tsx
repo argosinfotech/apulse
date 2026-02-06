@@ -298,71 +298,83 @@ export default function IntakeRequests() {
         </CardContent>
       </Card>
 
-      {/* Grid View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredRequests.map((request) => (
-          <Card 
-            key={request.id} 
-            className="shadow-card hover:shadow-lg transition-all cursor-pointer group"
-            onClick={() => handleViewDetails(request)}
-          >
-            <CardContent className="p-4">
-              {/* Header Row */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono text-muted-foreground">{request.id}</span>
-                  <Badge variant="outline" className={getTypeColor(request.type)}>
-                    {request.type}
-                  </Badge>
-                </div>
-                <Badge className={getUrgencyColor(request.urgency)}>
-                  {request.urgency}
-                </Badge>
-              </div>
-
-              {/* Summary */}
-              <h3 className="font-medium text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                {request.summary}
-              </h3>
-
-              {/* Meta Row */}
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{request.client}</span>
-                <Badge variant="outline" className={getStatusColor(request.status)}>
-                  {request.status}
-                </Badge>
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{request.source}</span>
-                  <span>•</span>
-                  <span>{request.daysOld === 0 ? "Today" : `${request.daysOld}d ago`}</span>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewDetails(request);
-                  }}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {filteredRequests.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">No intake requests found matching your criteria.</p>
-        </div>
-      )}
+      {/* Table View */}
+      <Card className="shadow-card">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border bg-muted/30">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">ID</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Client</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Summary</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Type</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Urgency</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Age</th>
+                  <th className="py-3 px-4"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRequests.map((request) => (
+                  <tr
+                    key={request.id}
+                    className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => handleViewDetails(request)}
+                  >
+                    <td className="py-3 px-4">
+                      <span className="text-sm font-mono text-muted-foreground">{request.id}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="text-sm font-medium text-foreground">{request.client}</span>
+                    </td>
+                    <td className="py-3 px-4 max-w-xs">
+                      <span className="text-sm text-foreground line-clamp-1">{request.summary}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Badge variant="outline" className={getTypeColor(request.type)}>
+                        {request.type}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Badge className={getUrgencyColor(request.urgency)}>
+                        {request.urgency}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Badge variant="outline" className={getStatusColor(request.status)}>
+                        {request.status}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`text-sm ${request.daysOld > 2 ? "text-warning font-medium" : "text-muted-foreground"}`}>
+                        {request.daysOld === 0 ? "Today" : `${request.daysOld}d`}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewDetails(request);
+                        }}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filteredRequests.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No intake requests found matching your criteria.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Detail Modal */}
       <IntakeDetailModal
