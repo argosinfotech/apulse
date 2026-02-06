@@ -1,6 +1,7 @@
-import { Bell, Search, HelpCircle } from "lucide-react";
+import { Search, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 export function TopBar() {
   return (
@@ -18,10 +19,7 @@ export function TopBar() {
 
       {/* Actions */}
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
-        </Button>
+        <NotificationDropdown />
         <Button variant="ghost" size="icon">
           <HelpCircle className="h-5 w-5 text-muted-foreground" />
         </Button>

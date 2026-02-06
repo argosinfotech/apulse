@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { canEdit as checkCanEdit } from "@/config/permissions";
 import { RiskFormModal, Risk, RiskType, Severity, RiskStatus } from "@/components/risks/RiskFormModal";
 import { RiskDetailModal } from "@/components/risks/RiskDetailModal";
@@ -81,6 +82,7 @@ const typeStyles: Record<RiskType, string> = {
 
 export default function Risks() {
   const { user } = useAuth();
+  const { addNotification } = useNotifications();
   const userCanEdit = user ? checkCanEdit(user.role, "risks") : false;
 
   const [risks, setRisks] = useState<Risk[]>(initialRisks);
@@ -138,6 +140,17 @@ export default function Risks() {
       };
       setRisks((prev) => [newRisk, ...prev]);
       toast({ title: "Risk Logged", description: `${newRisk.id} has been created.` });
+
+      // Notify Founder for High severity risks
+      if (data.severity === "High") {
+        addNotification({
+          type: "risk",
+          title: "High Severity Risk Logged",
+          message: `${newRisk.id}: ${data.type} - ${data.client}`,
+          link: "/risks",
+          forRole: "founder",
+        });
+      }
     }
     setEditingRisk(null);
   };
