@@ -271,18 +271,13 @@ export default function IntakeRequests() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Intake Requests</h1>
-            <p className="text-muted-foreground mt-1">
-              {canEditIntake ? "Manage incoming client requests and route to work items" : "View incoming client requests"}
-            </p>
-          </div>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-foreground">Intake Requests</h1>
           {!canEditIntake && (
-            <Badge variant="outline" className="bg-muted/50">
+            <Badge variant="outline" className="bg-muted/50 text-xs">
               <Eye className="h-3 w-3 mr-1" />
               View Only
             </Badge>
@@ -290,21 +285,22 @@ export default function IntakeRequests() {
         </div>
         {canEditIntake && (
           <Button 
+            size="sm"
             className="bg-accent hover:bg-accent/90 text-accent-foreground"
             onClick={handleAddRequest}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-1" />
             New Request
           </Button>
         )}
       </div>
 
-      {/* Status Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* Compact Status Summary */}
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
         {[
           { key: "all", label: "All", color: "bg-muted" },
           { key: "New", label: "New", color: "bg-primary" },
-          { key: "Need Client Info", label: "Need Info", color: "bg-warning" },
+          { key: "Need Client Info", label: "Info", color: "bg-warning" },
           { key: "Accepted", label: "Accepted", color: "bg-success" },
           { key: "Rejected", label: "Rejected", color: "bg-destructive" },
           { key: "Converted", label: "Converted", color: "bg-muted-foreground" },
@@ -312,55 +308,50 @@ export default function IntakeRequests() {
           <button
             key={status.key}
             onClick={() => setStatusFilter(status.key as IntakeStatus | "all")}
-            className={`p-3 rounded-lg border transition-all ${
+            className={`p-2 rounded-lg border transition-all ${
               statusFilter === status.key 
-                ? "border-primary bg-primary/5 shadow-md" 
+                ? "border-primary bg-primary/5" 
                 : "border-border hover:border-primary/50 bg-card"
             }`}
           >
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${status.color}`} />
-              <span className="text-sm font-medium text-foreground">{status.label}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className={`w-1.5 h-1.5 rounded-full ${status.color}`} />
+                <span className="text-xs font-medium text-muted-foreground">{status.label}</span>
+              </div>
+              <span className="text-lg font-bold text-foreground">
+                {statusCounts[status.key as keyof typeof statusCounts]}
+              </span>
             </div>
-            <p className="text-2xl font-bold text-foreground mt-1">
-              {statusCounts[status.key as keyof typeof statusCounts]}
-            </p>
           </button>
         ))}
       </div>
 
-      {/* Filters */}
-      <Card className="shadow-card">
-        <CardContent className="py-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by ID, client, or summary..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search */}
+      <div className="relative max-w-sm">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search requests..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-8 h-8 text-sm"
+        />
+      </div>
 
-      {/* Table View */}
+      {/* Compact Table View */}
       <Card className="shadow-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">ID</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Client</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Summary</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Type</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Urgency</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Age</th>
-                  <th className="py-3 px-4"></th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">ID</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Client</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Summary</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Type</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Urgency</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Status</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Age</th>
                 </tr>
               </thead>
               <tbody>
@@ -370,46 +361,34 @@ export default function IntakeRequests() {
                     className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => handleViewDetails(request)}
                   >
-                    <td className="py-3 px-4">
-                      <span className="text-sm font-mono text-muted-foreground">{request.id}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs font-mono text-muted-foreground">{request.id}</span>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="text-sm font-medium text-foreground">{request.client}</span>
+                    <td className="py-2 px-3">
+                      <span className="text-xs font-medium text-foreground">{request.client}</span>
                     </td>
-                    <td className="py-3 px-4 max-w-xs">
-                      <span className="text-sm text-foreground line-clamp-1">{request.summary}</span>
+                    <td className="py-2 px-3 max-w-[200px]">
+                      <span className="text-xs text-foreground line-clamp-1">{request.summary}</span>
                     </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline" className={getTypeColor(request.type)}>
+                    <td className="py-2 px-3">
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${getTypeColor(request.type)}`}>
                         {request.type}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge className={getUrgencyColor(request.urgency)}>
-                        {request.urgency}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline" className={getStatusColor(request.status)}>
-                        {request.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`text-sm ${request.daysOld > 2 ? "text-warning font-medium" : "text-muted-foreground"}`}>
-                        {request.daysOld === 0 ? "Today" : `${request.daysOld}d`}
                       </span>
                     </td>
-                    <td className="py-3 px-4">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewDetails(request);
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                    <td className="py-2 px-3">
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${getUrgencyColor(request.urgency)}`}>
+                        {request.urgency}
+                      </span>
+                    </td>
+                    <td className="py-2 px-3">
+                      <span className={`text-xs px-1.5 py-0.5 rounded border ${getStatusColor(request.status)}`}>
+                        {request.status}
+                      </span>
+                    </td>
+                    <td className="py-2 px-3">
+                      <span className={`text-xs ${request.daysOld > 2 ? "text-warning font-medium" : "text-muted-foreground"}`}>
+                        {request.daysOld === 0 ? "Today" : `${request.daysOld}d`}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -417,8 +396,8 @@ export default function IntakeRequests() {
             </table>
           </div>
           {filteredRequests.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No intake requests found matching your criteria.</p>
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground">No intake requests found.</p>
             </div>
           )}
         </CardContent>
