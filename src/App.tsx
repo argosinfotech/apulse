@@ -3,7 +3,17 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { MainLayout } from "@/components/layout/MainLayout";
+import Dashboard from "./pages/Dashboard";
+import Clients from "./pages/Clients";
+import IntakeRequests from "./pages/IntakeRequests";
+import WorkItems from "./pages/WorkItems";
+import Risks from "./pages/Risks";
+import Escalations from "./pages/Escalations";
+import Communications from "./pages/Communications";
+import Billing from "./pages/Billing";
+import WeeklySnapshot from "./pages/WeeklySnapshot";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -15,8 +25,18 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/intake" element={<IntakeRequests />} />
+            <Route path="/work-items" element={<WorkItems />} />
+            <Route path="/risks" element={<Risks />} />
+            <Route path="/escalations" element={<Escalations />} />
+            <Route path="/communications" element={<Communications />} />
+            <Route path="/billing" element={<Billing />} />
+            <Route path="/snapshot" element={<WeeklySnapshot />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
