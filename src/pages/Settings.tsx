@@ -1,12 +1,23 @@
-import { User, Bell, Shield, Palette, Database, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { User, Bell, Shield, Database, LogOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export default function Settings() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       {/* Header */}
@@ -29,22 +40,32 @@ export default function Settings() {
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center text-accent-foreground text-xl font-semibold">
-              M
+              {user?.name.charAt(0) || "?"}
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Manish</h3>
-              <p className="text-sm text-muted-foreground">Founder</p>
+              <h3 className="font-semibold text-foreground">{user?.name}</h3>
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "text-xs capitalize",
+                  user?.role === "founder" 
+                    ? "bg-amber-500/10 text-amber-600 border-amber-500/30" 
+                    : "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                )}
+              >
+                {user?.role}
+              </Badge>
             </div>
           </div>
           <Separator />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" defaultValue="Manish" />
+              <Input id="name" defaultValue={user?.name} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue="manish@argosinfotech.com" />
+              <Input id="email" type="email" defaultValue={user?.email} />
             </div>
           </div>
           <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
@@ -149,7 +170,11 @@ export default function Settings() {
               <p className="font-medium text-foreground">Sign Out</p>
               <p className="text-sm text-muted-foreground">Sign out of your account on this device</p>
             </div>
-            <Button variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10">
+            <Button 
+              variant="outline" 
+              className="text-destructive border-destructive/30 hover:bg-destructive/10"
+              onClick={handleLogout}
+            >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
             </Button>

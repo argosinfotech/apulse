@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -14,8 +14,11 @@ import {
   ChevronRight,
   Settings,
   LogOut,
+  ArrowLeftRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.svg";
 
 interface NavItem {
@@ -44,10 +47,22 @@ const bottomNavItems: NavItem[] = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, switchRole } = useAuth();
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const handleSwitchRole = () => {
+    const newRole = user?.role === "founder" ? "dcol" : "founder";
+    switchRole(newRole);
   };
 
   return (
@@ -80,12 +95,22 @@ export function AppSidebar() {
       )}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground font-semibold text-sm shrink-0">
-            M
+            {user?.name.charAt(0) || "?"}
           </div>
           {!collapsed && (
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">Manish</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">Founder</p>
+              <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name}</p>
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "text-xs capitalize border-sidebar-border",
+                  user?.role === "founder" 
+                    ? "bg-amber-500/20 text-amber-200 border-amber-500/30" 
+                    : "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
+                )}
+              >
+                {user?.role}
+              </Badge>
             </div>
           )}
         </div>
@@ -146,6 +171,20 @@ export function AppSidebar() {
           ))}
           <li>
             <button
+              onClick={handleSwitchRole}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200"
+            >
+              <ArrowLeftRight className="h-5 w-5 shrink-0" />
+              {!collapsed && (
+                <span className="truncate">
+                  Switch to {user?.role === "founder" ? "DCOL" : "Founder"}
+                </span>
+              )}
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={handleLogout}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200"
             >
               <LogOut className="h-5 w-5 shrink-0" />
