@@ -234,77 +234,70 @@ export default function Escalations() {
       className="shadow-card cursor-pointer hover:border-accent/30 transition-colors"
       onClick={() => handleViewDetails(escalation)}
     >
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-mono text-muted-foreground">{escalation.id}</span>
-            <Badge variant="outline" className={typeStyles[escalation.type]}>
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-muted-foreground">{escalation.id}</span>
+            <span className={`text-xs px-1.5 py-0.5 rounded ${typeStyles[escalation.type]}`}>
               {escalation.type}
-            </Badge>
+            </span>
             {escalation.status === "Decided" && (
-              <Badge variant="outline" className="bg-success/10 text-success border-success/20">
-                <CheckCircle className="h-3 w-3 mr-1" />
+              <span className="text-xs px-1.5 py-0.5 rounded bg-success/10 text-success flex items-center gap-1">
+                <CheckCircle className="h-3 w-3" />
                 Decided
-              </Badge>
+              </span>
             )}
             {escalation.status === "Draft" && (
-              <Badge variant="outline" className="bg-muted text-muted-foreground">
-                <FileEdit className="h-3 w-3 mr-1" />
+              <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground flex items-center gap-1">
+                <FileEdit className="h-3 w-3" />
                 Draft
-              </Badge>
+              </span>
             )}
           </div>
           {showDaysOpen && escalation.status === "Pending" && (
-            <div className="flex items-center gap-1 text-sm text-warning">
-              <Clock className="h-4 w-4" />
-              {escalation.daysOpen} days open
-            </div>
+            <span className="flex items-center gap-1 text-xs text-warning">
+              <Clock className="h-3 w-3" />
+              {escalation.daysOpen}d
+            </span>
           )}
         </div>
 
-        <div className="mb-4">
-          <p className="text-sm text-muted-foreground">{escalation.client}</p>
-          <h3 className="text-lg font-semibold text-foreground">{escalation.workItemTitle}</h3>
+        <div className="mb-2">
+          <p className="text-xs text-muted-foreground">{escalation.client}</p>
+          <h3 className="text-sm font-medium text-foreground line-clamp-1">{escalation.workItemTitle}</h3>
         </div>
 
         {escalation.status !== "Decided" ? (
           <>
-            <div className="p-4 rounded-lg bg-muted/50 mb-4">
-              <p className="text-sm text-muted-foreground line-clamp-2">{escalation.context}</p>
-            </div>
-
-            <div className="p-4 rounded-lg bg-accent/5 border border-accent/20 mb-4">
-              <div className="flex items-start gap-2">
-                <ArrowRight className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">DCOL Recommendation</p>
-                  <p className="text-sm font-medium text-accent line-clamp-2">{escalation.recommendation}</p>
-                </div>
+            <p className="text-xs text-muted-foreground line-clamp-1 mb-2">{escalation.context}</p>
+            <div className="p-2 rounded bg-accent/5 border border-accent/20 mb-2">
+              <div className="flex items-start gap-1.5">
+                <ArrowRight className="h-3 w-3 text-accent shrink-0 mt-0.5" />
+                <p className="text-xs text-accent line-clamp-1">{escalation.recommendation}</p>
               </div>
             </div>
           </>
         ) : (
-          <div className="p-4 rounded-lg bg-success/5 border border-success/20">
-            <p className="text-xs text-muted-foreground mb-1">Decision ({escalation.decisionDate})</p>
-            <p className="text-sm font-medium text-foreground">{escalation.decision}</p>
+          <div className="p-2 rounded bg-success/5 border border-success/20">
+            <p className="text-xs text-foreground line-clamp-1">{escalation.decision}</p>
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-border">
-          <span className="flex items-center gap-1 text-sm text-muted-foreground">
-            <User className="h-4 w-4" />
-            Filed by {escalation.createdBy} on {escalation.createdAt}
+        <div className="flex items-center justify-between pt-2 border-t border-border">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <User className="h-3 w-3" />
+            {escalation.createdBy} · {escalation.createdAt}
           </span>
           {userCanApprove && escalation.status === "Pending" && (
             <Button
               size="sm"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              className="h-6 text-xs bg-accent hover:bg-accent/90 text-accent-foreground"
               onClick={(e) => {
                 e.stopPropagation();
                 handleViewDetails(escalation);
               }}
             >
-              Make Decision
+              Decide
             </Button>
           )}
         </div>
@@ -313,78 +306,77 @@ export default function Escalations() {
   );
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-foreground">Escalations & Decisions</h1>
-            {!userCanEdit && !userCanApprove && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
-                View Only
-              </Badge>
-            )}
-          </div>
-          <p className="text-muted-foreground mt-1">
-            {userCanApprove
-              ? "Review and decide on escalated items"
-              : "File strategic escalations for Founder decision"}
-          </p>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-foreground">Escalations</h1>
+          {!userCanEdit && !userCanApprove && (
+            <Badge variant="secondary" className="text-xs flex items-center gap-1">
+              <Eye className="h-3 w-3" />
+              View Only
+            </Badge>
+          )}
         </div>
         {userCanEdit && (
-          <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
+          <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleCreate}>
+            <Plus className="h-4 w-4 mr-1" />
             File Escalation
           </Button>
         )}
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="pending" className="space-y-6">
-        <TabsList>
+      <Tabs defaultValue="pending" className="space-y-4">
+        <TabsList className="h-8">
           {userCanEdit && drafts.length > 0 && (
-            <TabsTrigger value="drafts" className="relative">
+            <TabsTrigger value="drafts" className="text-xs h-7 px-3">
               Drafts
-              <span className="ml-2 px-1.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">
+              <span className="ml-1.5 px-1 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-muted-foreground">
                 {drafts.length}
               </span>
             </TabsTrigger>
           )}
-          <TabsTrigger value="pending" className="relative">
+          <TabsTrigger value="pending" className="text-xs h-7 px-3">
             Pending
             {pending.length > 0 && (
-              <span className="ml-2 px-1.5 py-0.5 rounded-full text-xs font-semibold bg-destructive text-destructive-foreground">
+              <span className="ml-1.5 px-1 py-0.5 rounded-full text-[10px] font-semibold bg-destructive text-destructive-foreground">
                 {pending.length}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="decided">Decided</TabsTrigger>
+          <TabsTrigger value="decided" className="text-xs h-7 px-3">Decided</TabsTrigger>
         </TabsList>
 
         {userCanEdit && (
-          <TabsContent value="drafts" className="space-y-4">
+          <TabsContent value="drafts" className="space-y-2">
             {drafts.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">No draft escalations.</div>
+              <div className="text-center py-8 text-sm text-muted-foreground">No draft escalations.</div>
             ) : (
-              drafts.map((e) => renderEscalationCard(e, false))
+              <div className="grid gap-2 md:grid-cols-2">
+                {drafts.map((e) => renderEscalationCard(e, false))}
+              </div>
             )}
           </TabsContent>
         )}
 
-        <TabsContent value="pending" className="space-y-4">
+        <TabsContent value="pending" className="space-y-2">
           {pending.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">No pending escalations.</div>
+            <div className="text-center py-8 text-sm text-muted-foreground">No pending escalations.</div>
           ) : (
-            pending.map((e) => renderEscalationCard(e))
+            <div className="grid gap-2 md:grid-cols-2">
+              {pending.map((e) => renderEscalationCard(e))}
+            </div>
           )}
         </TabsContent>
 
-        <TabsContent value="decided" className="space-y-4">
+        <TabsContent value="decided" className="space-y-2">
           {decided.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">No decided escalations yet.</div>
+            <div className="text-center py-8 text-sm text-muted-foreground">No decided escalations yet.</div>
           ) : (
-            decided.map((e) => renderEscalationCard(e, false))
+            <div className="grid gap-2 md:grid-cols-2">
+              {decided.map((e) => renderEscalationCard(e, false))}
+            </div>
           )}
         </TabsContent>
       </Tabs>
