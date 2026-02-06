@@ -1,25 +1,24 @@
 import { useState } from "react";
-import { Plus, Search, Clock, ArrowRight, MessageSquare } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Search } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { IntakeFormModal, IntakeRequest, IntakeStatus, IntakeFormData } from "@/components/intake/IntakeFormModal";
+import { IntakeCard } from "@/components/intake/IntakeCard";
+import { ConvertToWorkItemModal, WorkItemFormData } from "@/components/intake/ConvertToWorkItemModal";
+import { toast } from "sonner";
 
-type IntakeStatus = "New" | "Need Client Info" | "Accepted" | "Rejected" | "Converted";
-
-interface IntakeRequest {
-  id: string;
-  client: string;
-  summary: string;
-  type: "Bug" | "Feature" | "SEO" | "Content" | "Admin" | "Question";
-  source: "Email" | "Call" | "Meeting" | "WhatsApp";
-  urgency: "Low" | "Medium" | "High";
-  status: IntakeStatus;
-  intakeDate: string;
-  daysOld: number;
-  clarifyingQuestions?: string;
-}
-
-const intakeRequests: IntakeRequest[] = [
+const initialRequests: IntakeRequest[] = [
   {
     id: "IR-001",
     client: "Stephengould",
@@ -69,20 +68,90 @@ const intakeRequests: IntakeRequest[] = [
 
 const statusColumns: IntakeStatus[] = ["New", "Need Client Info", "Accepted", "Rejected", "Converted"];
 
-const typeColors: Record<IntakeRequest["type"], string> = {
-  Bug: "bg-destructive/10 text-destructive",
-  Feature: "bg-primary/10 text-primary",
-  SEO: "bg-success/10 text-success",
-  Content: "bg-accent/10 text-accent",
-  Admin: "bg-muted text-muted-foreground",
-  Question: "bg-warning/10 text-warning",
-};
-
 export default function IntakeRequests() {
+  const [requests, setRequests] = useState<IntakeRequest[]>(initialRequests);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingRequest, setEditingRequest] = useState<IntakeRequest | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<IntakeRequest | null>(null);
+  const [convertModalOpen, setConvertModalOpen] = useState(false);
+  const [requestToConvert, setRequestToConvert] = useState<IntakeRequest | null>(null);
+
+  const filteredRequests = requests.filter((r) =>
+    r.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.client.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getRequestsByStatus = (status: IntakeStatus) => {
-    return intakeRequests.filter((r) => r.status === status);
+    return filteredRequests.filter((r) => r.status === status);
+  };
+
+  const handleAddRequest = () => {
+    setEditingRequest(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEditRequest = (request: IntakeRequest) => {
+    setEditingRequest(request);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteClick = (request: IntakeRequest) => {
+    setRequestToDelete(request);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (requestToDelete) {
+      setRequests(requests.filter((r) => r.id !== requestToDelete.id));
+      toast.success(`Request ${requestToDelete.id} has been deleted`);
+      setRequestToDelete(null);
+    }
+    setDeleteDialogOpen(false);
+  };
+
+  const handleStatusChange = (request: IntakeRequest, newStatus: IntakeStatus) => {
+    setRequests(requests.map((r) =>
+      r.id === request.id ? { ...r, status: newStatus } : r
+    ));
+    toast.success(`${request.id} moved to ${newStatus}`);
+  };
+
+  const handleConvertClick = (request: IntakeRequest) => {
+    setRequestToConvert(request);
+    setConvertModalOpen(true);
+  };
+
+  const handleConvert = (requestId: string, data: WorkItemFormData) => {
+    setRequests(requests.map((r) =>
+      r.id === requestId ? { ...r, status: "Converted" as IntakeStatus } : r
+    ));
+    toast.success(`Work item "${data.title}" created from ${requestId}`);
+  };
+
+  const handleFormSubmit = (data: IntakeFormData) => {
+    if (editingRequest) {
+      setRequests(requests.map((r) =>
+        r.id === editingRequest.id ? { ...r, ...data } : r
+      ));
+      toast.success(`Request ${editingRequest.id} has been updated`);
+    } else {
+      const newRequest: IntakeRequest = {
+        id: `IR-${String(requests.length + 1).padStart(3, "0")}`,
+        client: data.client,
+        summary: data.summary,
+        type: data.type,
+        source: data.source,
+        urgency: data.urgency,
+        clarifyingQuestions: data.clarifyingQuestions,
+        status: "New",
+        intakeDate: new Date().toISOString().split("T")[0],
+        daysOld: 0,
+      };
+      setRequests([newRequest, ...requests]);
+      toast.success(`Request ${newRequest.id} has been created`);
+    }
   };
 
   return (
@@ -95,7 +164,10 @@ export default function IntakeRequests() {
             Manage incoming client requests and route to work items
           </p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+        <Button 
+          className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          onClick={handleAddRequest}
+        >
           <Plus className="h-4 w-4 mr-2" />
           New Request
         </Button>
@@ -130,51 +202,14 @@ export default function IntakeRequests() {
             </div>
             <div className="space-y-3">
               {getRequestsByStatus(status).map((request) => (
-                <Card
+                <IntakeCard
                   key={request.id}
-                  className={`shadow-card hover:shadow-soft transition-all cursor-pointer ${
-                    request.daysOld > 2 ? "border-l-2 border-l-warning" : ""
-                  }`}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono text-muted-foreground">{request.id}</span>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${typeColors[request.type]}`}>
-                        {request.type}
-                      </span>
-                    </div>
-                    <h4 className="font-medium text-foreground text-sm mb-2 line-clamp-2">
-                      {request.summary}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mb-3">{request.client}</p>
-                    
-                    {request.clarifyingQuestions && (
-                      <div className="flex items-start gap-1.5 p-2 rounded bg-warning/10 mb-3">
-                        <MessageSquare className="h-3.5 w-3.5 text-warning shrink-0 mt-0.5" />
-                        <p className="text-xs text-warning">{request.clarifyingQuestions}</p>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="px-2 py-0.5 rounded bg-muted">{request.source}</span>
-                      <span className={`flex items-center gap-1 ${request.daysOld > 2 ? "text-warning" : ""}`}>
-                        <Clock className="h-3 w-3" />
-                        {request.daysOld}d old
-                      </span>
-                    </div>
-
-                    {request.status === "Accepted" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full mt-3 text-accent border-accent hover:bg-accent hover:text-accent-foreground"
-                      >
-                        <ArrowRight className="h-3 w-3 mr-1" />
-                        Convert to Work Item
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
+                  request={request}
+                  onEdit={handleEditRequest}
+                  onDelete={handleDeleteClick}
+                  onStatusChange={handleStatusChange}
+                  onConvert={handleConvertClick}
+                />
               ))}
               {getRequestsByStatus(status).length === 0 && (
                 <div className="p-4 text-center text-sm text-muted-foreground border border-dashed border-border rounded-lg">
@@ -185,6 +220,43 @@ export default function IntakeRequests() {
           </div>
         ))}
       </div>
+
+      {/* Intake Form Modal */}
+      <IntakeFormModal
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        request={editingRequest}
+        onSubmit={handleFormSubmit}
+      />
+
+      {/* Convert to Work Item Modal */}
+      <ConvertToWorkItemModal
+        open={convertModalOpen}
+        onOpenChange={setConvertModalOpen}
+        request={requestToConvert}
+        onConvert={handleConvert}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {requestToDelete?.id}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
