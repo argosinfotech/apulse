@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Pencil, Clock, Briefcase, MessageSquare, Inbox, TrendingUp, TrendingDown, Calendar, User, ExternalLink } from "lucide-react";
+import { ArrowLeft, Pencil, Clock, Briefcase, MessageSquare, Inbox, Calendar, User, Phone, Mail } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge, HealthStatus } from "@/components/ui/status-badge";
 import { Progress } from "@/components/ui/progress";
+import { ClientFormModal, ClientFormData } from "@/components/clients/ClientFormModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { canEdit } from "@/config/permissions";
+import { toast } from "sonner";
 
 interface Client {
   id: string;
@@ -22,8 +24,10 @@ interface Client {
   updateFrequency: string;
   activeWorkItems: number;
   openEscalations: number;
-  primaryContact?: string;
-  email?: string;
+  contactFirstName?: string;
+  contactLastName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   startDate?: string;
 }
 
@@ -66,8 +70,10 @@ const clientsData: Record<string, Client> = {
     updateFrequency: "Weekly",
     activeWorkItems: 3,
     openEscalations: 1,
-    primaryContact: "John Smith",
-    email: "john@stephengould.com",
+    contactFirstName: "John",
+    contactLastName: "Smith",
+    contactPhone: "+1 (555) 123-4567",
+    contactEmail: "john@stephengould.com",
     startDate: "Oct 2023",
   },
   "C-002": {
@@ -82,8 +88,10 @@ const clientsData: Record<string, Client> = {
     updateFrequency: "Weekly",
     activeWorkItems: 2,
     openEscalations: 0,
-    primaryContact: "Sarah Lee",
-    email: "sarah@virtumeet.com",
+    contactFirstName: "Sarah",
+    contactLastName: "Lee",
+    contactPhone: "+1 (555) 234-5678",
+    contactEmail: "sarah@virtumeet.com",
     startDate: "Aug 2023",
   },
   "C-003": {
@@ -97,8 +105,10 @@ const clientsData: Record<string, Client> = {
     updateFrequency: "Bi-weekly",
     activeWorkItems: 4,
     openEscalations: 0,
-    primaryContact: "Mike Chen",
-    email: "mike@tel.com",
+    contactFirstName: "Mike",
+    contactLastName: "Chen",
+    contactPhone: "+1 (555) 345-6789",
+    contactEmail: "mike@tel.com",
     startDate: "Nov 2023",
   },
   "C-004": {
@@ -112,8 +122,10 @@ const clientsData: Record<string, Client> = {
     updateFrequency: "Weekly",
     activeWorkItems: 2,
     openEscalations: 0,
-    primaryContact: "Emma Wilson",
-    email: "emma@soli.io",
+    contactFirstName: "Emma",
+    contactLastName: "Wilson",
+    contactPhone: "+1 (555) 456-7890",
+    contactEmail: "emma@soli.io",
     startDate: "Dec 2023",
   },
   "C-005": {
@@ -127,8 +139,10 @@ const clientsData: Record<string, Client> = {
     updateFrequency: "Bi-weekly",
     activeWorkItems: 1,
     openEscalations: 0,
-    primaryContact: "David Brown",
-    email: "david@spiritworx.com",
+    contactFirstName: "David",
+    contactLastName: "Brown",
+    contactPhone: "+1 (555) 567-8901",
+    contactEmail: "david@spiritworx.com",
     startDate: "Jan 2024",
   },
 };
@@ -183,12 +197,17 @@ export default function ClientDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const canEditClients = user ? canEdit(user.role, "clients") : false;
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const client = clientId ? clientsData[clientId] : null;
   const workItems = clientId ? workItemsData[clientId] || [] : [];
   const requests = clientId ? requestsData[clientId] || [] : [];
   const communications = clientId ? communicationsData[clientId] || [] : [];
 
+  const handleEditSubmit = (data: ClientFormData) => {
+    toast.success(`${data.name} has been updated`);
+    // In a real app, this would update the client data
+  };
   if (!client) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
@@ -248,7 +267,7 @@ export default function ClientDetail() {
           </div>
         </div>
         {canEditClients && (
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => setEditModalOpen(true)}>
             <Pencil className="h-3.5 w-3.5 mr-1" />
             Edit
           </Button>
@@ -368,11 +387,22 @@ export default function ClientDetail() {
               <CardContent className="px-4 pb-4 pt-0 space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{client.primaryContact}</span>
+                  <span className="font-medium">
+                    {client.contactFirstName} {client.contactLastName}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">{client.email}</span>
-                </div>
+                {client.contactPhone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">{client.contactPhone}</span>
+                  </div>
+                )}
+                {client.contactEmail && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">{client.contactEmail}</span>
+                  </div>
+                )}
                 <div className="pt-2">
                   <Button variant="outline" size="sm" className="w-full h-7 text-xs">
                     <MessageSquare className="h-3 w-3 mr-1" />
@@ -479,6 +509,18 @@ export default function ClientDetail() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Edit Client Modal */}
+      <ClientFormModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        client={client ? {
+          ...client,
+          accountType: client.accountType as "Retainer" | "Project" | "Internal Product",
+          revenueTier: client.revenueTier as "High" | "Med" | "Low",
+        } : null}
+        onSubmit={handleEditSubmit}
+      />
     </div>
   );
 }
