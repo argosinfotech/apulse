@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { canEdit as checkCanEdit, hasPermission } from "@/config/permissions";
 import { EscalationFormModal, Escalation, EscalationType, DecisionStatus, EscalationFormData } from "@/components/escalations/EscalationFormModal";
 import { EscalationDetailModal } from "@/components/escalations/EscalationDetailModal";
@@ -103,6 +104,7 @@ const typeStyles: Record<EscalationType, string> = {
 
 export default function Escalations() {
   const { user } = useAuth();
+  const { addNotification } = useNotifications();
   const userCanEdit = user ? checkCanEdit(user.role, "escalations") : false;
   const userCanApprove = user ? hasPermission(user.role, "escalations", "approve") : false;
 
@@ -148,6 +150,17 @@ export default function Escalations() {
         )
       );
       toast({ title: "Escalation Updated", description: `${editingEscalation.id} has been updated.` });
+      
+      // Notify Founder if status changed to Pending
+      if (data.status === "Pending" && editingEscalation.status === "Draft") {
+        addNotification({
+          type: "escalation",
+          title: "Escalation Submitted",
+          message: `${editingEscalation.id}: ${data.type} - ${data.workItemTitle}`,
+          link: "/escalations",
+          forRole: "founder",
+        });
+      }
     } else {
       const newEscalation: Escalation = {
         ...data,
@@ -162,6 +175,17 @@ export default function Escalations() {
         title: data.status === "Draft" ? "Draft Saved" : "Escalation Filed",
         description: `${newEscalation.id} has been ${data.status === "Draft" ? "saved as draft" : "submitted for decision"}.`,
       });
+
+      // Notify Founder when new escalation is filed (not draft)
+      if (data.status === "Pending") {
+        addNotification({
+          type: "escalation",
+          title: "New Escalation Filed",
+          message: `${newEscalation.id}: ${data.type} - ${data.workItemTitle}`,
+          link: "/escalations",
+          forRole: "founder",
+        });
+      }
     }
     setEditingEscalation(null);
   };
@@ -173,6 +197,7 @@ export default function Escalations() {
 
   const handleDecision = (escalationId: string, selectedOption: string, notes: string) => {
     const now = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const escalation = escalations.find((e) => e.id === escalationId);
     
     setEscalations((prev) =>
       prev.map((e) =>
@@ -190,6 +215,17 @@ export default function Escalations() {
       )
     );
     toast({ title: "Decision Made", description: `${escalationId} has been resolved.` });
+
+    // Notify DCOL that a decision was made
+    if (escalation) {
+      addNotification({
+        type: "decision",
+        title: "Decision Made",
+        message: `${escalationId}: ${selectedOption} - ${escalation.workItemTitle}`,
+        link: "/escalations",
+        forRole: "dcol",
+      });
+    }
   };
 
   const renderEscalationCard = (escalation: Escalation, showDaysOpen = true) => (
