@@ -28,6 +28,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+// Available clients for dropdown
+const availableClients = [
+  { id: "C-001", name: "Stephengould" },
+  { id: "C-002", name: "Virtu-Meet" },
+  { id: "C-003", name: "TEL" },
+  { id: "C-004", name: "SOLI" },
+  { id: "C-005", name: "SpiritWorx" },
+];
+
 export type IntakeStatus = "New" | "Need Client Info" | "Accepted" | "Rejected" | "Converted";
 export type IntakeType = "Bug" | "Feature" | "Enhancement" | "SEO" | "Content" | "Admin" | "Question";
 export type IntakeSource = "Email" | "Call" | "Meeting" | "WhatsApp" | "Slack";
@@ -141,9 +150,20 @@ export function IntakeFormModal({ open, onOpenChange, request, onSubmit }: Intak
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Client</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter client name" {...field} />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Select client" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-popover">
+                      {availableClients.map((client) => (
+                        <SelectItem key={client.id} value={client.name}>
+                          {client.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

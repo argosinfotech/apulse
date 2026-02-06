@@ -1,9 +1,13 @@
-import { Inbox, Briefcase, AlertTriangle, MessageSquareWarning, Clock, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Inbox, Briefcase, AlertTriangle, MessageSquareWarning, Clock, CheckCircle2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "./StatCard";
 import { Progress } from "@/components/ui/progress";
+import { IntakeFormModal, IntakeFormData } from "@/components/intake/IntakeFormModal";
+import { toast } from "@/hooks/use-toast";
 
 interface IntakeItem {
   id: string;
@@ -107,6 +111,9 @@ const escalations: Escalation[] = [
 ];
 
 export function DCOLDashboard() {
+  const navigate = useNavigate();
+  const [intakeFormOpen, setIntakeFormOpen] = useState(false);
+
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case "critical": return "bg-destructive text-destructive-foreground";
@@ -125,14 +132,32 @@ export function DCOLDashboard() {
     }
   };
 
+  const handleIntakeSubmit = (data: IntakeFormData) => {
+    toast({
+      title: "Request Created",
+      description: `New intake request for ${data.client} has been logged.`,
+    });
+    // Navigate to intake page to see the new request
+    navigate("/intake");
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Daily Control Board</h1>
-        <p className="text-muted-foreground mt-1">
-          Operational overview — intake, active work, and escalations
-        </p>
+      {/* Header with Quick Action */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Daily Control Board</h1>
+          <p className="text-muted-foreground mt-1">
+            Operational overview — intake, active work, and escalations
+          </p>
+        </div>
+        <Button 
+          className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          onClick={() => setIntakeFormOpen(true)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Request
+        </Button>
       </div>
 
       {/* Stats Row */}
@@ -282,6 +307,13 @@ export function DCOLDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Intake Form Modal */}
+      <IntakeFormModal
+        open={intakeFormOpen}
+        onOpenChange={setIntakeFormOpen}
+        onSubmit={handleIntakeSubmit}
+      />
     </div>
   );
 }
