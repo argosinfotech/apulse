@@ -160,6 +160,27 @@ export default function IntakeRequests() {
     toast.success(`Work item "${data.title}" created from ${requestId}`);
   };
 
+  const handleAddNote = (requestId: string, noteText: string) => {
+    const newNote = {
+      id: `note-${Date.now()}`,
+      text: noteText,
+      author: user?.name || "Unknown",
+      createdAt: new Date().toLocaleString(),
+    };
+    setRequests(requests.map((r) =>
+      r.id === requestId 
+        ? { ...r, notes: [...(r.notes || []), newNote] }
+        : r
+    ));
+    // Update selectedRequest to show the new note immediately
+    setSelectedRequest((prev) => 
+      prev && prev.id === requestId 
+        ? { ...prev, notes: [...(prev.notes || []), newNote] }
+        : prev
+    );
+    toast.success("Note added");
+  };
+
   const handleFormSubmit = (data: IntakeFormData) => {
     if (editingRequest) {
       setRequests(requests.map((r) =>
@@ -385,6 +406,7 @@ export default function IntakeRequests() {
         onDelete={handleDeleteClick}
         onStatusChange={handleStatusChange}
         onConvert={handleConvertClick}
+        onAddNote={handleAddNote}
         canEdit={canEditIntake}
       />
 

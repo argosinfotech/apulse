@@ -1,6 +1,8 @@
-import { IntakeRequest, IntakeStatus } from "./IntakeFormModal";
+import { useState } from "react";
+import { IntakeRequest, IntakeStatus, IntakeNote } from "./IntakeFormModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Clock, User, MessageSquare, Tag, ArrowRight, Pencil, Trash2 } from "lucide-react";
+import { Calendar, Clock, User, MessageSquare, Tag, ArrowRight, Pencil, Trash2, Send, Plus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface IntakeDetailModalProps {
   open: boolean;
@@ -25,6 +28,7 @@ interface IntakeDetailModalProps {
   onDelete: (request: IntakeRequest) => void;
   onStatusChange: (request: IntakeRequest, status: IntakeStatus) => void;
   onConvert: (request: IntakeRequest) => void;
+  onAddNote: (requestId: string, note: string) => void;
   canEdit: boolean;
 }
 
@@ -36,9 +40,22 @@ export function IntakeDetailModal({
   onDelete,
   onStatusChange,
   onConvert,
+  onAddNote,
   canEdit,
 }: IntakeDetailModalProps) {
+  const { user } = useAuth();
+  const [newNote, setNewNote] = useState("");
+  const [showNoteInput, setShowNoteInput] = useState(false);
+
   if (!request) return null;
+
+  const handleAddNote = () => {
+    if (newNote.trim()) {
+      onAddNote(request.id, newNote.trim());
+      setNewNote("");
+      setShowNoteInput(false);
+    }
+  };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
@@ -73,7 +90,7 @@ export function IntakeDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold">{request.id}</DialogTitle>
@@ -92,7 +109,7 @@ export function IntakeDetailModal({
           <Separator />
 
           {/* Details Grid */}
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">Client:</span>
@@ -128,18 +145,73 @@ export function IntakeDetailModal({
             </div>
           </div>
 
-          {/* Clarifying Questions */}
-          {request.clarifyingQuestions && (
-            <>
-              <Separator />
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Clarifying Questions</p>
-                <p className="text-sm text-foreground bg-muted/50 p-3 rounded-lg">
-                  {request.clarifyingQuestions}
-                </p>
+          {/* Notes Thread */}
+          <Separator />
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-foreground">Activity Notes</h4>
+              {canEdit && !showNoteInput && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowNoteInput(true)}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Note
+                </Button>
+              )}
+            </div>
+
+            {/* Add Note Input */}
+            {showNoteInput && canEdit && (
+              <div className="mb-3 space-y-2">
+                <Textarea
+                  placeholder="Add a note (e.g., 'Asked client for date range requirements via email')"
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  className="resize-none"
+                  rows={2}
+                />
+                <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={handleAddNote} disabled={!newNote.trim()}>
+                    <Send className="h-3 w-3 mr-1" />
+                    Add Note
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={() => {
+                      setShowNoteInput(false);
+                      setNewNote("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-            </>
-          )}
+            )}
+
+            {/* Notes List */}
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {request.notes && request.notes.length > 0 ? (
+                request.notes.map((note) => (
+                  <div 
+                    key={note.id} 
+                    className="p-2 rounded bg-muted/50 text-sm"
+                  >
+                    <p className="text-foreground">{note.text}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <span>{note.author}</span>
+                      <span>•</span>
+                      <span>{note.createdAt}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground italic">No notes yet</p>
+              )}
+            </div>
+          </div>
 
           {/* Actions */}
           {canEdit && request.status !== "Converted" && (
