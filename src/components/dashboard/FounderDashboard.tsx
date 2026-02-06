@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Clock, AlertTriangle, CheckCircle, Users, TrendingUp, FileCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,8 @@ const clientHealth: ClientHealth[] = [
 ];
 
 export function FounderDashboard() {
+  const navigate = useNavigate();
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high": return "bg-destructive/10 text-destructive border-destructive/30";
@@ -76,21 +79,21 @@ export function FounderDashboard() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Strategic Overview</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-xl font-bold text-foreground">Strategic Overview</h1>
+        <p className="text-sm text-muted-foreground">
           Pending decisions and client health at a glance
         </p>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Row - More Compact */}
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Pending Decisions"
           value="3"
-          subtitle="Awaiting your approval"
+          subtitle="Awaiting approval"
           icon={Clock}
           trend={{ value: 2, label: "new today", positive: false }}
           variant="warning"
@@ -98,7 +101,7 @@ export function FounderDashboard() {
         <StatCard
           title="At-Risk Clients"
           value="2"
-          subtitle="Yellow or Red status"
+          subtitle="Yellow or Red"
           icon={AlertTriangle}
           trend={{ value: 1, label: "from last week", positive: false }}
           variant="destructive"
@@ -113,58 +116,65 @@ export function FounderDashboard() {
         <StatCard
           title="Active Clients"
           value="8"
-          subtitle="Total active engagements"
+          subtitle="Total engagements"
           icon={Users}
           trend={{ value: 12, label: "growth", positive: true }}
           variant="success"
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* Pending Decisions */}
         <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Clock className="h-5 w-5 text-muted-foreground" />
-              Pending Decisions
-            </CardTitle>
+          <CardHeader className="py-3 px-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                Pending Decisions
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => navigate("/escalations")}
+              >
+                View All
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="px-4 pb-3 pt-0 space-y-2">
             {pendingDecisions.map((decision) => (
               <div
                 key={decision.id}
-                className="p-4 rounded-lg border border-border bg-card hover:shadow-md transition-shadow"
+                onClick={() => navigate("/escalations")}
+                className="p-2.5 rounded border border-border bg-card hover:bg-muted/50 transition-colors cursor-pointer"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="outline" className={getPriorityColor(decision.priority)}>
-                        {decision.priority}
-                      </Badge>
-                      <Badge variant="outline" className="capitalize">
-                        {decision.type}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {decision.daysWaiting}d waiting
-                      </span>
-                    </div>
-                    <h4 className="font-medium text-foreground">{decision.title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{decision.description}</p>
-                    {decision.dcolRecommendation && (
-                      <div className="mt-2 p-2 rounded bg-accent/50 text-sm">
-                        <span className="font-medium text-accent-foreground">DCOL recommends:</span>{" "}
-                        <span className="text-muted-foreground">{decision.dcolRecommendation}</span>
-                      </div>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant="outline" className={`${getPriorityColor(decision.priority)} text-xs px-1.5 py-0`}>
+                    {decision.priority}
+                  </Badge>
+                  <Badge variant="outline" className="capitalize text-xs px-1.5 py-0">
+                    {decision.type}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground ml-auto">
+                    {decision.daysWaiting}d
+                  </span>
                 </div>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" variant="default" className="bg-success hover:bg-success/90">
-                    <CheckCircle className="h-4 w-4 mr-1" />
+                <h4 className="font-medium text-sm text-foreground line-clamp-1">{decision.title}</h4>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{decision.description}</p>
+                {decision.dcolRecommendation && (
+                  <div className="mt-1.5 p-1.5 rounded bg-accent/50 text-xs">
+                    <span className="font-medium text-accent-foreground">DCOL:</span>{" "}
+                    <span className="text-muted-foreground line-clamp-1">{decision.dcolRecommendation}</span>
+                  </div>
+                )}
+                <div className="flex gap-2 mt-2">
+                  <Button size="sm" variant="default" className="bg-success hover:bg-success/90 h-6 text-xs px-2">
+                    <CheckCircle className="h-3 w-3 mr-1" />
                     Approve
                   </Button>
-                  <Button size="sm" variant="outline">
-                    Review Details
+                  <Button size="sm" variant="outline" className="h-6 text-xs px-2">
+                    Review
                   </Button>
                 </div>
               </div>
@@ -174,29 +184,40 @@ export function FounderDashboard() {
 
         {/* Client Health Overview */}
         <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              Client Health
-            </CardTitle>
+          <CardHeader className="py-3 px-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                Client Health
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => navigate("/clients")}
+              >
+                View All
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent className="px-4 pb-3 pt-0">
+            <div className="space-y-2">
               {clientHealth.map((client) => (
                 <div
                   key={client.name}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  onClick={() => navigate("/clients")}
+                  className="flex items-center justify-between p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${getStatusColor(client.status)}`} />
+                  <div className="flex items-center gap-2.5">
+                    <div className={`w-2.5 h-2.5 rounded-full ${getStatusColor(client.status)}`} />
                     <div>
-                      <p className="font-medium text-foreground">{client.name}</p>
-                      <p className="text-xs text-muted-foreground">Last contact: {client.lastContact}</p>
+                      <p className="font-medium text-sm text-foreground">{client.name}</p>
+                      <p className="text-xs text-muted-foreground">Last: {client.lastContact}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp 
-                      className={`h-4 w-4 ${
+                      className={`h-3.5 w-3.5 ${
                         client.trend === "up" 
                           ? "text-success" 
                           : client.trend === "down" 
@@ -204,7 +225,7 @@ export function FounderDashboard() {
                             : "text-muted-foreground rotate-90"
                       }`} 
                     />
-                    <Button variant="ghost" size="sm">View</Button>
+                    <Button variant="ghost" size="sm" className="h-6 text-xs px-2">View</Button>
                   </div>
                 </div>
               ))}
