@@ -16,6 +16,7 @@ import WorkItems from "./pages/WorkItems";
 import Risks from "./pages/Risks";
 import Escalations from "./pages/Escalations";
 import Communications from "./pages/Communications";
+import Notifications from "./pages/Notifications";
 
 import WeeklySnapshot from "./pages/WeeklySnapshot";
 import Settings from "./pages/Settings";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/risks" element={<Risks />} />
                 <Route path="/escalations" element={<Escalations />} />
                 <Route path="/communications" element={<Communications />} />
+                <Route path="/notifications" element={<Notifications />} />
                 
                 <Route path="/snapshot" element={<WeeklySnapshot />} />
                 <Route path="/settings" element={<Settings />} />
