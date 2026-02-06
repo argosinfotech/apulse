@@ -142,26 +142,27 @@ export function DCOLDashboard() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header with Quick Action */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Daily Control Board</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-xl font-bold text-foreground">Daily Control Board</h1>
+          <p className="text-sm text-muted-foreground">
             Operational overview — intake, active work, and escalations
           </p>
         </div>
         <Button 
+          size="sm"
           className="bg-accent hover:bg-accent/90 text-accent-foreground"
           onClick={() => setIntakeFormOpen(true)}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 mr-1" />
           New Request
         </Button>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Row - More Compact */}
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Intake Queue"
           value="3"
@@ -173,7 +174,7 @@ export function DCOLDashboard() {
         <StatCard
           title="Active Work Items"
           value="12"
-          subtitle="In progress this week"
+          subtitle="In progress"
           icon={Briefcase}
           variant="default"
         />
@@ -188,36 +189,44 @@ export function DCOLDashboard() {
         <StatCard
           title="Pending Escalations"
           value="2"
-          subtitle="Awaiting Founder review"
+          subtitle="Awaiting review"
           icon={MessageSquareWarning}
           variant="accent"
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         {/* Intake Queue */}
         <Card className="shadow-card">
-          <CardHeader className="pb-3">
+          <CardHeader className="py-3 px-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Inbox className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Inbox className="h-4 w-4 text-muted-foreground" />
                 Intake Queue
               </CardTitle>
-              <Button variant="outline" size="sm">View All</Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => navigate("/intake")}
+              >
+                View All
+              </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="px-4 pb-3 pt-0 space-y-2">
             {intakeQueue.map((item) => (
               <div
                 key={item.id}
-                className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => navigate("/intake")}
+                className="p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <Badge className={getUrgencyColor(item.urgency)}>{item.urgency}</Badge>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <Badge className={`${getUrgencyColor(item.urgency)} text-xs px-1.5 py-0`}>{item.urgency}</Badge>
                   <span className="text-xs text-muted-foreground">{item.receivedAt}</span>
                 </div>
-                <p className="font-medium text-sm text-foreground">{item.summary}</p>
-                <div className="flex items-center gap-2 mt-1">
+                <p className="font-medium text-sm text-foreground line-clamp-1">{item.summary}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="text-xs text-muted-foreground">{item.client}</span>
                   <span className="text-xs text-muted-foreground">•</span>
                   <span className="text-xs text-muted-foreground">{item.type}</span>
@@ -229,33 +238,41 @@ export function DCOLDashboard() {
 
         {/* Active Work Items */}
         <Card className="shadow-card">
-          <CardHeader className="pb-3">
+          <CardHeader className="py-3 px-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Briefcase className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
                 Active Work
               </CardTitle>
-              <Button variant="outline" size="sm">View All</Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => navigate("/work-items")}
+              >
+                View All
+              </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="px-4 pb-3 pt-0 space-y-2">
             {activeWorkItems.map((item) => (
               <div
                 key={item.id}
-                className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => navigate("/work-items")}
+                className="p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-mono text-muted-foreground">{item.id}</span>
                   {getStatusBadge(item.status)}
                 </div>
-                <p className="font-medium text-sm text-foreground">{item.title}</p>
-                <p className="text-xs text-muted-foreground mt-1">{item.client} • Due {item.dueDate}</p>
-                <div className="mt-2">
-                  <div className="flex items-center justify-between text-xs mb-1">
+                <p className="font-medium text-sm text-foreground line-clamp-1">{item.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{item.client} • Due {item.dueDate}</p>
+                <div className="mt-1.5">
+                  <div className="flex items-center justify-between text-xs mb-0.5">
                     <span className="text-muted-foreground">Progress</span>
                     <span className="font-medium">{item.progress}%</span>
                   </div>
-                  <Progress value={item.progress} className="h-1.5" />
+                  <Progress value={item.progress} className="h-1" />
                 </div>
               </div>
             ))}
@@ -264,44 +281,57 @@ export function DCOLDashboard() {
 
         {/* Escalations */}
         <Card className="shadow-card">
-          <CardHeader className="pb-3">
+          <CardHeader className="py-3 px-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <MessageSquareWarning className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="flex items-center gap-2 text-base">
+                <MessageSquareWarning className="h-4 w-4 text-muted-foreground" />
                 Escalations
               </CardTitle>
-              <Button variant="outline" size="sm">New</Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => navigate("/escalations")}
+              >
+                View All
+              </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="px-4 pb-3 pt-0 space-y-2">
             {escalations.map((esc) => (
               <div
                 key={esc.id}
-                className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => navigate("/escalations")}
+                className="p-2.5 rounded border border-border hover:bg-muted/50 transition-colors cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-mono text-muted-foreground">{esc.id}</span>
                   <Badge 
                     variant="outline" 
-                    className={
+                    className={`text-xs px-1.5 py-0 ${
                       esc.status === "pending_approval" 
                         ? "bg-warning/10 text-warning border-warning/30" 
                         : "bg-muted"
-                    }
+                    }`}
                   >
-                    {esc.status === "pending_approval" ? "Pending Approval" : "Draft"}
+                    {esc.status === "pending_approval" ? "Pending" : "Draft"}
                   </Badge>
                 </div>
                 <p className="font-medium text-sm text-foreground">{esc.client}</p>
-                <p className="text-xs text-muted-foreground mt-1">{esc.issue}</p>
-                <div className="flex items-center gap-2 mt-2">
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{esc.issue}</p>
+                <div className="flex items-center gap-1.5 mt-1">
                   <Clock className="h-3 w-3 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">{esc.createdAt}</span>
                 </div>
               </div>
             ))}
-            <Button variant="ghost" size="sm" className="w-full mt-2">
-              <CheckCircle2 className="h-4 w-4 mr-2" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full mt-1 h-7 text-xs"
+              onClick={() => navigate("/escalations")}
+            >
+              <CheckCircle2 className="h-3 w-3 mr-1" />
               Submit for Approval
             </Button>
           </CardContent>
