@@ -19,6 +19,7 @@ import Communications from "./pages/Communications";
 import Notifications from "./pages/Notifications";
 
 import WeeklySnapshot from "./pages/WeeklySnapshot";
+import SnapshotHistory from "./pages/SnapshotHistory";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/notifications" element={<Notifications />} />
                 
                 <Route path="/snapshot" element={<WeeklySnapshot />} />
+                <Route path="/snapshot-history" element={<SnapshotHistory />} />
                 <Route path="/settings" element={<Settings />} />
               </Route>
               <Route path="*" element={<NotFound />} />
