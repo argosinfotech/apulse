@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { DCOLProvider } from "@/contexts/DCOLContext";
+import { CommunicationsProvider } from "@/contexts/CommunicationsContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
 import Login from "./pages/Login";
@@ -19,6 +20,7 @@ import WorkItems from "./pages/WorkItems";
 import Risks from "./pages/Risks";
 import Escalations from "./pages/Escalations";
 import Communications from "./pages/Communications";
+import ClientThread from "./pages/ClientThread";
 import Notifications from "./pages/Notifications";
 
 import WeeklySnapshot from "./pages/WeeklySnapshot";
@@ -34,43 +36,48 @@ const App = () => (
     <AuthProvider>
       <NotificationProvider>
         <DCOLProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/login/founder" element={<LoginFounder />} />
-              <Route path="/login/dcol" element={<LoginDCOL />} />
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <MainLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/clients" element={<Clients />} />
-                <Route path="/clients/:clientId" element={<ClientDetail />} />
-                <Route path="/intake" element={<IntakeRequests />} />
-                <Route path="/work-items" element={<WorkItems />} />
-                <Route path="/risks" element={<Risks />} />
-                <Route path="/escalations" element={<Escalations />} />
-                <Route path="/communications" element={<Communications />} />
-                <Route path="/notifications" element={<Notifications />} />
-                
-                <Route path="/snapshot" element={<WeeklySnapshot />} />
-                <Route path="/snapshot-history" element={<SnapshotHistory />} />
-                <Route path="/settings" element={<Settings />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </DCOLProvider>
-    </NotificationProvider>
-  </AuthProvider>
-</QueryClientProvider>
+          <CommunicationsProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Public client thread view - no auth required */}
+                  <Route path="/c/:token" element={<ClientThread />} />
+                  
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/login/founder" element={<LoginFounder />} />
+                  <Route path="/login/dcol" element={<LoginDCOL />} />
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <MainLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/clients" element={<Clients />} />
+                    <Route path="/clients/:clientId" element={<ClientDetail />} />
+                    <Route path="/intake" element={<IntakeRequests />} />
+                    <Route path="/work-items" element={<WorkItems />} />
+                    <Route path="/risks" element={<Risks />} />
+                    <Route path="/escalations" element={<Escalations />} />
+                    <Route path="/communications" element={<Communications />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    
+                    <Route path="/snapshot" element={<WeeklySnapshot />} />
+                    <Route path="/snapshot-history" element={<SnapshotHistory />} />
+                    <Route path="/settings" element={<Settings />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </CommunicationsProvider>
+        </DCOLProvider>
+      </NotificationProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 export default App;
