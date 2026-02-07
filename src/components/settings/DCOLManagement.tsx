@@ -44,7 +44,7 @@ export function DCOLManagement() {
     if (dcolToDelete) {
       deleteDCOL(dcolToDelete.id);
       toast({
-        title: "DCOL Removed",
+        title: "Coordinator Removed",
         description: `${dcolToDelete.name} has been removed.`,
         variant: "destructive",
       });
@@ -57,13 +57,13 @@ export function DCOLManagement() {
     if (editingDCOL) {
       updateDCOL(editingDCOL.id, data);
       toast({
-        title: "DCOL Updated",
+        title: "Coordinator Updated",
         description: `${data.name} has been updated.`,
       });
     } else {
       addDCOL(data);
       toast({
-        title: "DCOL Added",
+        title: "Coordinator Added",
         description: `${data.name} has been added to the team.`,
       });
     }
@@ -80,7 +80,7 @@ export function DCOLManagement() {
                 <Users className="h-5 w-5 text-muted-foreground" />
                 Team Management
               </CardTitle>
-              <CardDescription>Manage DCOLs and their client assignments</CardDescription>
+              <CardDescription>Manage Delivery Coordinators and their client assignments</CardDescription>
             </div>
             <Button
               size="sm"
@@ -88,7 +88,7 @@ export function DCOLManagement() {
               onClick={handleAdd}
             >
               <Plus className="h-4 w-4 mr-1" />
-              Add DCOL
+              Add Coordinator
             </Button>
           </div>
         </CardHeader>
@@ -96,8 +96,8 @@ export function DCOLManagement() {
           {dcols.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
-              <p>No DCOLs added yet</p>
-              <p className="text-sm">Add your first DCOL to get started</p>
+              <p>No Delivery Coordinators added yet</p>
+              <p className="text-sm">Add your first coordinator to get started</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -195,7 +195,7 @@ export function DCOLManagement() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove DCOL</AlertDialogTitle>
+            <AlertDialogTitle>Remove Coordinator</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to remove {dcolToDelete?.name}? Their client assignments will be cleared. This action cannot be undone.
             </AlertDialogDescription>

@@ -132,7 +132,7 @@ export function AppSidebar() {
               <ArrowLeftRight className="h-5 w-5 shrink-0" />
               {!collapsed && (
                 <span className="truncate">
-                  Switch to {user?.role === "founder" ? "DCOL" : "Founder"}
+                  Switch to {user?.role === "founder" ? "Delivery Coordinator" : "Founder"}
                 </span>
               )}
             </button>

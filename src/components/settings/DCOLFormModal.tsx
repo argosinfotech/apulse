@@ -114,7 +114,7 @@ export function DCOLFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{dcol ? "Edit DCOL" : "Add New DCOL"}</DialogTitle>
+          <DialogTitle>{dcol ? "Edit Coordinator" : "Add New Coordinator"}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -231,7 +231,7 @@ export function DCOLFormModal({
                 Cancel
               </Button>
               <Button type="submit" className="bg-accent hover:bg-accent/90">
-                {dcol ? "Save Changes" : "Add DCOL"}
+                {dcol ? "Save Changes" : "Add Coordinator"}
               </Button>
             </div>
           </form>
