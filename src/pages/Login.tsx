@@ -16,7 +16,7 @@ export default function Login() {
     },
     {
       id: "dcol",
-      title: "DCOL",
+      title: "Delivery Coordinator",
       description: "Day-to-day operations, client management, and execution",
       icon: Headset,
       user: "Sarah Chen",

@@ -33,7 +33,7 @@ export default function LoginDCOL() {
             <div className="p-1.5 rounded-md bg-white/10">
               <Headset className="h-4 w-4 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-white">DCOL Login</h1>
+            <h1 className="text-xl font-bold text-white">Delivery Coordinator Login</h1>
           </div>
           <p className="text-white/60 text-sm">Day-to-day operations and execution</p>
         </div>
@@ -43,7 +43,7 @@ export default function LoginDCOL() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Sign in as Sarah Chen</CardTitle>
             <CardDescription className="text-xs">
-              Enter your credentials to access the DCOL dashboard
+              Enter your credentials to access the Delivery Coordinator dashboard
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -82,7 +82,7 @@ export default function LoginDCOL() {
 
         {/* Switch Role Link */}
         <p className="text-center text-xs text-white/50">
-          Not a DCOL?{" "}
+          Not a Delivery Coordinator?{" "}
           <Link to="/login/founder" className="text-white/80 hover:text-white underline">
             Login as Founder
           </Link>
