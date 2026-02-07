@@ -71,7 +71,6 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="overflow-hidden">
               <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name}</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email}</p>
             </div>
           )}
         </div>
