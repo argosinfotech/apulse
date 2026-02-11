@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, Headset } from "lucide-react";
+import { User, Headset } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.svg";
 
@@ -10,7 +10,7 @@ export default function Login() {
       id: "founder",
       title: "Founder",
       description: "Strategic oversight, approvals, and high-level decisions",
-      icon: Crown,
+      icon: User,
       user: "Manish",
       path: "/login/founder",
     },
