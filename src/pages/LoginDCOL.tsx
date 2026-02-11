@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Headset } from "lucide-react";
+import { User } from "lucide-react";
 import logo from "@/assets/logo.svg";
 
 export default function LoginDCOL() {
@@ -31,7 +31,7 @@ export default function LoginDCOL() {
           <img src={logo} alt="Argos" className="h-10 w-auto mx-auto brightness-0 invert mb-3" />
           <div className="flex items-center justify-center gap-2 mb-1">
             <div className="p-1.5 rounded-md bg-white/10">
-              <Headset className="h-4 w-4 text-white" />
+              <User className="h-4 w-4 text-white" />
             </div>
             <h1 className="text-xl font-bold text-white">Delivery Coordinator Login</h1>
           </div>
