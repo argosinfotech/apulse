@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Headset } from "lucide-react";
+import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.svg";
 
@@ -18,7 +18,7 @@ export default function Login() {
       id: "dcol",
       title: "Delivery Coordinator",
       description: "Day-to-day operations, client management, and execution",
-      icon: Headset,
+      icon: User,
       user: "Sarah Chen",
       path: "/login/dcol",
     },
