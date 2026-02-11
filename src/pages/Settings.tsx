@@ -75,50 +75,6 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Notifications */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            Notifications
-          </CardTitle>
-          <CardDescription>Configure how you receive alerts</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-foreground">New Escalations</p>
-              <p className="text-sm text-muted-foreground">Get notified when DCOL files an escalation</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-foreground">Client Health Changes</p>
-              <p className="text-sm text-muted-foreground">Alert when a client moves to Yellow or Red</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-foreground">Invoice Approvals</p>
-              <p className="text-sm text-muted-foreground">Reminder for invoices awaiting approval</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-foreground">Weekly Snapshot Ready</p>
-              <p className="text-sm text-muted-foreground">Notify when DCOL publishes weekly snapshot</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-        </CardContent>
-      </Card>
-
       {/* DCOL Management - Founder Only */}
       {user?.role === "founder" && <DCOLManagement />}
 
